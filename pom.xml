@@ -8,10 +8,10 @@
 		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.asg</groupId>
-	<artifactId>commonServices</artifactId>
+	<groupId>com.asg.common.services</groupId>
+	<artifactId>asg-common-services</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>commonServices</name>
+	<name>asg-common-services</name>
 	<description>Common Services module of Al sharif</description>
 	<url/>
 	<licenses>
