@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.asg.common.services.common.ApiResponse.success;
+import static com.asg.common.lib.dto.response.ApiResponse.success;
+
 
 @Slf4j
 @RestController

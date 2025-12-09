@@ -1,6 +1,9 @@
 package com.asg.common.services.exceptions;
 
-import com.asg.common.services.common.ApiResponse;
+import com.asg.common.lib.dto.response.ApiResponse;
+import com.asg.common.lib.exception.CustomException;
+import com.asg.common.lib.exception.ResourceAlreadyExistsException;
+import com.asg.common.lib.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.xml.bind.ValidationException;
 import org.apache.commons.lang3.StringUtils;

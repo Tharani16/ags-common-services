@@ -1,10 +1,10 @@
 package com.asg.common.services.service.impl;
 
+import com.asg.common.lib.exception.ValidationException;
 import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.RecentMenuDto;
 import com.asg.common.services.dto.UserPreferenceRequest;
 import com.asg.common.services.dto.UserProfileSettingDto;
-import com.asg.common.services.exceptions.ValidationException;
 import com.asg.common.services.service.UserPreferenceService;
 
 import oracle.jdbc.OracleTypes;

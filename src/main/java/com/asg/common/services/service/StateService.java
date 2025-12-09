@@ -1,7 +1,7 @@
 package com.asg.common.services.service;
 
+import com.asg.common.lib.exception.ResourceNotFoundException;
 import com.asg.common.services.entity.State;
-import com.asg.common.services.exceptions.ResourceNotFoundException;
 import com.asg.common.services.repository.StateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

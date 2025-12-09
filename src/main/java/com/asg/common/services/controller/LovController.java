@@ -1,11 +1,11 @@
 package com.asg.common.services.controller;
 
 import com.asg.common.lib.dto.LovGetListDto;
-import com.asg.common.lib.service.LovService;
-import com.asg.common.services.common.ApiResponse;
+
+import com.asg.common.lib.service.LovDataService;
+import com.asg.common.lib.utility.PaginationProperties;
 import com.asg.common.services.entity.State;
 import com.asg.common.services.service.StateService;
-import com.asg.common.services.utility.PaginationProperties;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.asg.common.services.common.ApiResponse.badRequest;
-import static com.asg.common.services.common.ApiResponse.success;
+import static com.asg.common.lib.dto.response.ApiResponse.*;
 
 @RestController
 @RequestMapping("/v1/lovs")
@@ -30,7 +29,7 @@ import static com.asg.common.services.common.ApiResponse.success;
 public class LovController {
 
     @Autowired
-    private LovService lovService;
+    private LovDataService lovService;
 
     @Autowired
     private PaginationProperties paginationProperties;
@@ -1166,7 +1165,7 @@ public class LovController {
         } catch (IllegalArgumentException e) {
             return badRequest(e.getMessage());
         } catch (Exception ex) {
-            return ApiResponse.internalServerError("Error fetching Timezones: " + ex.getMessage());
+            return internalServerError("Error fetching Timezones: " + ex.getMessage());
         }
     }
 
@@ -1904,7 +1903,7 @@ public class LovController {
             }
             return success(lovName + " fetched successfully", result);
         } catch (Exception ex) {
-            return ApiResponse.internalServerError("Error fetching " + lovName + ": " + ex.getMessage());
+            return internalServerError("Error fetching " + lovName + ": " + ex.getMessage());
         }
     }
 
