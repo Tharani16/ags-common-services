@@ -59,7 +59,6 @@ public class BillwiseBreakupController {
                     )
             }
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/showPending")
     public ResponseEntity<?> getPendingBillwiseBreakup(
             @Parameter(description = "Group POID", required = true, example = "1")
@@ -111,7 +110,6 @@ public class BillwiseBreakupController {
                     )
             }
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/showAllPending")
     public ResponseEntity<?> getAllPendingBillwiseBreakup(
             @Parameter(description = "Group POID", required = true, example = "1")

@@ -39,7 +39,6 @@ public class CommonDataServiceController {
             },
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/glDetails/{glPoid}")
     public ResponseEntity<?> getGLMasterData(
             @Parameter(description = "glPoid reference identifier", required = true, example = "201")
@@ -60,7 +59,6 @@ public class CommonDataServiceController {
             },
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/calculateTax")
     public ResponseEntity<?> calculateTax(
             @Parameter(description = "Tax POID reference identifier", required = true, example = "201")
@@ -93,7 +91,6 @@ public class CommonDataServiceController {
                     )
             }
     )
-    @AllowedAction(UserRolesRightsEnum.CREATE)
     @PostMapping("/term-condition/insert")
     public ResponseEntity<?> insertGlobalTerms(
             @RequestBody List<GlobalTermsInsertRequestDto> requestList
@@ -120,7 +117,6 @@ public class CommonDataServiceController {
                     )
             }
     )
-    @AllowedAction(UserRolesRightsEnum.DELETE)
     @DeleteMapping("/term-condition/delete")
     public ResponseEntity<?> deleteGlobalTerms(
             @Parameter(description = "Document ID", required = true, example = "PO-1001")
@@ -153,7 +149,6 @@ public class CommonDataServiceController {
                     )
             }
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/term-condition/load")
     public ResponseEntity<?> loadGlobalTermsList(
             @Parameter(description = "Document ID", required = true, example = "PO-1001")
@@ -191,7 +186,6 @@ public class CommonDataServiceController {
                     )
             }
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/currency/get-rate")
     public ResponseEntity<?> getCurrencyRate(
 
@@ -241,7 +235,6 @@ public class CommonDataServiceController {
             },
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/stock/details/{stockPoid}")
     public ResponseEntity<?> getStockDetails(
             @Parameter(description = "Stock POID reference", required = true, example = "2001")

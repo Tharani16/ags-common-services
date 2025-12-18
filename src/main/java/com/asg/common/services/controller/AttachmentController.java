@@ -40,7 +40,6 @@ public class AttachmentController {
         this.attachmentService = attachmentService;
     }
 
-    @AllowedAction(UserRolesRightsEnum.CREATE)
     @Operation(summary = "Upload files and/or update remarks - supports structured and array formats")
     @PostMapping(value = "/{docId}/{docKeyPoid}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFilesWithMetadata(
@@ -195,7 +194,7 @@ public class AttachmentController {
         - **ALL:** Returns all attachments regardless of status
     """
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
+
     @GetMapping("/{docId}/{docKeyPoid}/list")
     public ResponseEntity<?> getAttachments(
             @Parameter(description = "Document identifier", required = true)
@@ -245,7 +244,6 @@ public class AttachmentController {
     ### Authorization Parameters
     """
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/{docId}/{docKeyPoid}/list-active")
     public ResponseEntity<?> getActiveAttachments(
             @Parameter(description = "Document identifier", required = true)
@@ -294,7 +292,6 @@ public class AttachmentController {
         - **ALL:** Returns all attachments regardless of status
     """
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/{docId}/{docKeyPoid}/filter")
     public ResponseEntity<?> getAttachmentsByFilter(
             @Parameter(description = "Document identifier", required = true)
@@ -360,7 +357,6 @@ public class AttachmentController {
         - **docId:** Document identifier
     """
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/documents/{docId}/attachments/checklist")
     public ResponseEntity<?> getAttachmentChecklist(
             @Parameter(description = "Document identifier", required = true)
@@ -384,7 +380,6 @@ public class AttachmentController {
     ### Authorization Parameters
     """
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/{docId}/checklist")
     public ResponseEntity<?> getChecklist(
             @Parameter(description = "Document identifier", required = true)
@@ -412,7 +407,6 @@ public class AttachmentController {
     ### Authorization Parameters
     """
     )
-    @AllowedAction(UserRolesRightsEnum.DELETE)
     @DeleteMapping("/{docId}/{docKeyPoid}/{fileNameMapped}")
     public ResponseEntity<?> deleteAttachment(
             @Parameter(description = "Document identifier", required = true)
@@ -447,7 +441,6 @@ public class AttachmentController {
     ### Authorization Parameters
     """
     )
-    @AllowedAction(UserRolesRightsEnum.DELETE)
     @DeleteMapping("/{docId}/{docKeyPoid}/delete-all")
     public ResponseEntity<?> deleteAllAttachments(
             @Parameter(description = "Document identifier", required = true)
@@ -481,7 +474,6 @@ public class AttachmentController {
     ### Authorization Parameters
     """
     )
-    @AllowedAction(UserRolesRightsEnum.EDIT)
     @PutMapping("/{docId}/{docKeyPoid}/{fileNameMapped}/archive")
     public ResponseEntity<?> archiveAttachment(
             @Parameter(description = "Document identifier", required = true)
@@ -513,7 +505,6 @@ public class AttachmentController {
         - **fileNameMapped:** Mapped filename of attachment to activate
     """
     )
-    @AllowedAction(UserRolesRightsEnum.EDIT)
     @PutMapping("/{docId}/{docKeyPoid}/{fileNameMapped}/active")
     public ResponseEntity<?> activeAttachment(
             @Parameter(description = "Document identifier", required = true)
@@ -546,7 +537,6 @@ public class AttachmentController {
     ### Authorization Parameters
     """
     )
-    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/{docId}/{docKeyPoid}/{fileNameMapped}/download")
     public ResponseEntity<?> downloadAttachment(
             @Parameter(description = "Document identifier", required = true)
