@@ -1,6 +1,7 @@
 package com.asg.common.services.repository;
 
 import com.asg.common.services.dto.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;

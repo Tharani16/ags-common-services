@@ -7,7 +7,7 @@ import com.asg.common.services.dto.*;
 import com.asg.common.services.entity.GLMaster;
 import com.asg.common.services.entity.StockMasterEntity;
 import com.asg.common.services.entity.TaxMaster;
-import com.asg.common.services.entity.TaxMasterRepository;
+import com.asg.common.services.repository.TaxMasterRepository;
 import com.asg.common.services.repository.GLMasterRepository;
 import com.asg.common.services.repository.GlobalTermsConditionRepository;
 import com.asg.common.services.repository.StockMasterRepository;

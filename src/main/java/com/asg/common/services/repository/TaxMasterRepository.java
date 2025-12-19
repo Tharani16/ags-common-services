@@ -1,6 +1,6 @@
-package com.asg.common.services.entity;
+package com.asg.common.services.repository;
 
-
+import com.asg.common.services.entity.TaxMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
