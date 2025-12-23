@@ -1,5 +1,6 @@
 package com.asg.common.services.controller;
 
+import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.GlPostingViewResponseDto;
 import com.asg.common.services.dto.GlrePostingDto;
 import com.asg.common.services.service.GlPostingService;
@@ -46,12 +47,9 @@ public class GlPostingController {
     })
     @GetMapping
     public ResponseEntity<?> getGlPostings(
-
-            @Parameter(description = "Document ID", required = true)
-            @RequestParam String docId,
             @Parameter(description = "Transaction POID", required = true)
             @RequestParam Long transactionPoid) throws SQLException {
-        GlPostingViewResponseDto glPostings = service.fetchGlPostings(docId, transactionPoid);
+        GlPostingViewResponseDto glPostings = service.fetchGlPostings(UserContext.getDocumentId(), transactionPoid);
         return success("GL postings retrieved successfully", glPostings);
     }
 

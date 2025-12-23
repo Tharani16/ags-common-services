@@ -2,6 +2,7 @@ package com.asg.common.services.controller;
 
 import com.asg.common.lib.annotation.AllowedAction;
 import com.asg.common.lib.enums.UserRolesRightsEnum;
+import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.GlVoucherPendingBillwiseBreakupResponseDto;
 import com.asg.common.services.service.BillwiseBreakupService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,12 +62,6 @@ public class BillwiseBreakupController {
     )
     @GetMapping("/showPending")
     public ResponseEntity<?> getPendingBillwiseBreakup(
-            @Parameter(description = "Group POID", required = true, example = "1")
-            @RequestParam Long groupPoid,
-
-            @Parameter(description = "Company POID", required = true, example = "1")
-            @RequestParam Long companyPoid,
-
             @Parameter(description = "GL POID", required = true, example = "12345")
             @RequestParam Long glPoid,
 
@@ -76,7 +71,7 @@ public class BillwiseBreakupController {
     ) {
 
         GlVoucherPendingBillwiseBreakupResponseDto response =
-                service.showPendingBillwiseBreakup(groupPoid, companyPoid, glPoid, asOnDate);
+                service.showPendingBillwiseBreakup(UserContext.getGroupPoid(), UserContext.getCompanyPoid(), glPoid, asOnDate);
 
         return success("Pending Billwise breakup details fetched successfully", response);
     }
@@ -112,12 +107,6 @@ public class BillwiseBreakupController {
     )
     @GetMapping("/showAllPending")
     public ResponseEntity<?> getAllPendingBillwiseBreakup(
-            @Parameter(description = "Group POID", required = true, example = "1")
-            @RequestParam Long groupPoid,
-
-            @Parameter(description = "Company POID", required = true, example = "1")
-            @RequestParam Long companyPoid,
-
             @Parameter(description = "GL POID", required = true, example = "12345")
             @RequestParam Long glPoid,
 
@@ -127,7 +116,7 @@ public class BillwiseBreakupController {
     ) {
 
         GlVoucherPendingBillwiseBreakupResponseDto response =
-                service.showAllPendingBillwiseBreakup(groupPoid, companyPoid, glPoid, asOnDate);
+                service.showAllPendingBillwiseBreakup(UserContext.getGroupPoid(), UserContext.getCompanyPoid(), glPoid, asOnDate);
 
         return success("Pending All Billwise breakup details fetched successfully", response);
     }

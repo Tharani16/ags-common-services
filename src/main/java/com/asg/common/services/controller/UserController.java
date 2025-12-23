@@ -1,5 +1,6 @@
 package com.asg.common.services.controller;
 
+import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.FavoriteMenuRequest;
 import com.asg.common.services.entity.FavoriteMenuEntity;
 import com.asg.common.services.service.FavoriteMenuService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.asg.common.lib.dto.response.ApiResponse.internalServerError;
 import static com.asg.common.lib.dto.response.ApiResponse.success;
@@ -30,12 +32,11 @@ public class UserController {
     private FavoriteMenuService favoriteMenuService;
 
     @GetMapping("/favorite-menu/favoriteList")
-    public ResponseEntity<?> getFavoriteMenuList(@RequestParam(required = false) Long userPoid,
-                                                 @Parameter(hidden = true) @RequestParam(required = false, defaultValue = "") String userId) {
+    public ResponseEntity<?> getFavoriteMenuList() {
         try {
-            String processedUserId = (!userId.isEmpty()) ? userId.toUpperCase() : null;
+            String processedUserId = Objects.requireNonNull(UserContext.getUserId()).toUpperCase();
 
-            List<FavoriteMenuEntity> favorites = favoriteMenuService.getFavoriteList(userPoid, processedUserId);
+            List<FavoriteMenuEntity> favorites = favoriteMenuService.getFavoriteList(UserContext.getUserPoid(), processedUserId);
             return success("success", favorites);
         } catch (Exception e) {
             return internalServerError("Error fetching favorite menus: " + e.getMessage());
@@ -43,12 +44,10 @@ public class UserController {
     }
 
     @GetMapping("/favorite-menu/unAssignedFavoriteList")
-    public ResponseEntity<?> getFavoriteMenusAvailable(@RequestParam(required = false) Long userPoid,
-                                                       @RequestParam(required = false) String userId,
-                                                       @RequestParam(required = false) String search,
-                                                       @ParameterObject Pageable pageable) {
+    public ResponseEntity<?> getFavoriteMenusAvailable(@RequestParam(required = false) String search, @ParameterObject Pageable pageable) {
         try {
-            Map<String, Object> favorites = favoriteMenuService.getUnassignedFavList(userPoid, userId.toUpperCase(), search, pageable);
+            String processedUserId = Objects.requireNonNull(UserContext.getUserId()).toUpperCase();
+            Map<String, Object> favorites = favoriteMenuService.getUnassignedFavList(UserContext.getUserPoid(), processedUserId, search, pageable);
             return success("success", favorites);
         } catch (Exception e) {
             return internalServerError("Error fetching favorite menus: " + e.getMessage());
