@@ -1878,7 +1878,7 @@ public class LovController {
                                                String lovType, String lovName,
                                                Integer pageNumber, Integer pageSize,
                                                String sortBy, String sortDir) {
-        return handleLovRequestWithDefaults(filter, groupPoid, companyPoid, userPoid, lovType, lovName, pageNumber, pageSize, sortBy, sortDir, null, null);
+        return handleLovRequestWithDefaults(filter, groupPoid, companyPoid, userPoid, lovType, lovName, pageNumber, pageSize, sortBy, sortDir, null, null, null);
     }
 
     // ===== Common handler for dynamic LOVs with default parameters =====
@@ -1886,7 +1886,8 @@ public class LovController {
                                                           String lovType, String lovName,
                                                           Integer pageNumber, Integer pageSize,
                                                           String sortBy, String sortDir,
-                                                          List<String> defaultCode, List<Long> defaultPoid) {
+                                                          List<String> defaultCode, List<Long> defaultPoid,
+                                                          String filterField) {
         try {
             // apply defaults from PaginationProperties if null
             int page = pageNumber != null ? pageNumber : paginationProperties.getPageNumber();
@@ -1899,7 +1900,7 @@ public class LovController {
             if ("BANK_MASTER".equals(lovType)) {
                 result = lovService.getBankMasterLov(filter, groupPoid, companyPoid, userPoid, page, size, sortField, sortOrder);
             } else {
-                result = lovService.getLovList(filter, groupPoid, companyPoid, userPoid, lovType, page, size, sortField, sortOrder, defaultCode, defaultPoid);
+                result = lovService.getLovList(filter, groupPoid, companyPoid, userPoid, lovType, page, size, sortField, sortOrder, defaultCode, defaultPoid, filterField);
             }
             return success(lovName + " fetched successfully", result);
         } catch (Exception ex) {
@@ -2532,6 +2533,7 @@ public class LovController {
     public ResponseEntity<?> getLovList(
             @PathVariable String lovName,
             @Parameter(description = "Filter text for searching lov list") @RequestParam(required = false) String filter,
+            @Parameter(description = "Filter field name (maps to P_LOV_FILTER_FIELD)") @RequestParam(required = false) String filterField,
             @Parameter(description = "Group identifier") @RequestParam(defaultValue = "1") Long groupPoid,
             @Parameter(description = "Company identifier") @RequestParam(defaultValue = "0") Long companyPoid,
             @Parameter(description = "User identifier") @RequestParam(defaultValue = "0") Long userPoid,
@@ -2544,7 +2546,7 @@ public class LovController {
         try {
             validateSortParameters(sortBy, sortDir);
             return handleLovRequestWithDefaults(filter, groupPoid, companyPoid, userPoid,
-                    lovName, lovName, pageNumber, pageSize, sortBy, sortDir, defaultCode, defaultPoid);
+                    lovName, lovName, pageNumber, pageSize, sortBy, sortDir, defaultCode, defaultPoid, filterField);
         } catch (IllegalArgumentException e) {
             return badRequest(e.getMessage());
         }
