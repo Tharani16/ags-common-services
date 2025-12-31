@@ -1,6 +1,11 @@
 package com.asg.common.services.service;
 
-import com.asg.common.services.dto.*;
+import com.asg.common.lib.dto.GLMasterCommonDTO;
+import com.asg.common.lib.dto.ReconcileResultDto;
+import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
+import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
+import com.asg.common.lib.dto.response.StockDetailsResponse;
+import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
 
 import java.util.List;
 
@@ -42,5 +47,14 @@ public interface CommonDataService {
     );
 
     public StockDetailsResponse getStockDetails(Long stockPoid);
+
+    String createPoFromRfq(
+            Long loginGroupPoid,
+            Long loginUserPoid,
+            Long loginCompanyPoid,
+            Long poPoid,
+            String supplierPoid,
+            String rfqPoid
+    );
 
 }

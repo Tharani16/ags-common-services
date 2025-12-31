@@ -1,7 +1,7 @@
 package com.asg.common.services.service.impl;
 
 import com.asg.common.services.dto.DocAcquireLockRequestDto;
-import com.asg.common.services.dto.DocReleaseLockRequestDto;
+import com.asg.common.lib.dto.request.DocReleaseLockRequestDto;
 import com.asg.common.services.dto.DocUpdateLockRequestDto;
 import com.asg.common.services.repository.DocumentLockRepository;
 import com.asg.common.services.service.DocumentLockService;

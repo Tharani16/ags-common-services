@@ -1,19 +1,23 @@
 package com.asg.common.services.service.impl;
 
+import com.asg.common.lib.dto.GLMasterCommonDTO;
+import com.asg.common.lib.dto.GLMasterDto;
 import com.asg.common.lib.dto.LovGetListDto;
+import com.asg.common.lib.dto.ReconcileResultDto;
+import com.asg.common.lib.dto.StockInfoDto;
+import com.asg.common.lib.dto.TaxMasterDto;
+import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
+import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
+import com.asg.common.lib.dto.response.StockDetailsResponse;
+import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
 import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.lib.service.LovDataService;
-import com.asg.common.services.dto.*;
-import com.asg.common.services.entity.GLMaster;
-import com.asg.common.services.entity.StockMasterEntity;
-import com.asg.common.services.entity.TaxMaster;
-import com.asg.common.services.repository.TaxMasterRepository;
-import com.asg.common.services.repository.GLMasterRepository;
+import com.asg.common.services.client.TaxServiceClient;
+import com.asg.common.services.client.GLMasterServiceClient;
+import com.asg.common.services.client.StockServiceClient;
 import com.asg.common.services.repository.GlobalTermsConditionRepository;
-import com.asg.common.services.repository.StockMasterRepository;
 import com.asg.common.services.service.CommonDataService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.StoredProcedureQuery;
 import jakarta.transaction.Transactional;
@@ -28,11 +32,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommonDataServiceImpl implements CommonDataService {
 
-    private final GLMasterRepository glMasterRepository;
-    private final TaxMasterRepository taxMasterRepository;
+    private final GLMasterServiceClient glMasterServiceClient;
+    private final TaxServiceClient taxServiceClient;
+    private final StockServiceClient stockServiceClient;
     private final GlobalTermsConditionRepository globalTermsConditionRepository;
-
-    private final StockMasterRepository stockMasterRepository;
     private final LovDataService lovService;
 
     @PersistenceContext
@@ -40,8 +43,7 @@ public class CommonDataServiceImpl implements CommonDataService {
 
     @Override
     public GLMasterCommonDTO getGLMasterDetails(Long glPoid) {
-        GLMaster gl = glMasterRepository.findByGlPoid(glPoid)
-                .orElseThrow(() -> new RuntimeException("GL Master not found for POID = " + glPoid));
+        GLMasterDto gl = glMasterServiceClient.getGLMaster(glPoid);
 
         GLMasterCommonDTO dto = new GLMasterCommonDTO();
         dto.setGlCode(gl.getGlCode());
@@ -56,9 +58,8 @@ public class CommonDataServiceImpl implements CommonDataService {
     }
 
 
-    private TaxMaster getTaxMaster(Long taxPoid) {
-        return taxMasterRepository.findByTaxPoid(taxPoid)
-                .orElseThrow(() -> new RuntimeException("Invalid Tax POID: " + taxPoid));
+    private TaxMasterDto getTaxMaster(Long taxPoid) {
+        return taxServiceClient.getTaxMaster(taxPoid);
     }
 
     public TaxCalculationResponseDto calculateTaxForPettyCash(Long taxPoid, Double drAmt) {
@@ -67,7 +68,7 @@ public class CommonDataServiceImpl implements CommonDataService {
             throw new RuntimeException("Tax Poid and Dr Amount are required");
         }
 
-        TaxMaster taxMaster = getTaxMaster(taxPoid);
+        TaxMasterDto taxMaster = getTaxMaster(taxPoid);
 
         Double taxPercentage = taxMaster.getPercentage();
 
@@ -231,12 +232,7 @@ public class CommonDataServiceImpl implements CommonDataService {
 
     @Override
     public StockDetailsResponse getStockDetails(Long stockPoid) {
-
-        StockMasterEntity stock = stockMasterRepository.findByStockPoid(stockPoid)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Stock not found for poid: " + stockPoid));
-
-        // Fetch LOV values
+        StockInfoDto stock = stockServiceClient.getStockInfo(stockPoid);
 
         LovGetListDto stockLov = lovService.getDetailsByPoidAndLovName(
                 stock.getStockPoid(),
@@ -249,7 +245,7 @@ public class CommonDataServiceImpl implements CommonDataService {
         );
 
         LovGetListDto taxLov = lovService.getDetailsByPoidAndLovName(
-                stock.getInputTaxPoid(),
+                stock.getTaxPoid(),
                 "INPUT_TAX_MASTER"
         );
 
@@ -261,11 +257,30 @@ public class CommonDataServiceImpl implements CommonDataService {
                 .stockDtl(stockLov)
                 .stockUnitPoid(stock.getStockUnitPoid())
                 .unitDtl(unitLov)
-                .inputTaxPoid(stock.getInputTaxPoid())
+                .inputTaxPoid(stock.getTaxPoid())
                 .taxDtl(taxLov)
                 .stockCost(stock.getStockCost())
-                .remarks(stock.getRemarks())
+                .remarks(null)
                 .build();
+    }
+
+    @Override
+    public String createPoFromRfq(
+            Long loginGroupPoid,
+            Long loginUserPoid,
+            Long loginCompanyPoid,
+            Long poPoid,
+            String supplierPoid,
+            String rfqPoid
+    ) {
+        return globalTermsConditionRepository.createPoFromRfq(
+                loginGroupPoid,
+                loginUserPoid,
+                loginCompanyPoid,
+                poPoid,
+                supplierPoid,
+                rfqPoid
+        );
     }
 
 }
