@@ -1,9 +1,8 @@
 package com.asg.common.services.repository;
 
 
-import com.asg.common.services.dto.GlobalTermsInsertRequestDto;
-import com.asg.common.services.dto.GlobalTermsResponseDto;
-import org.springframework.stereotype.Repository;
+import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
+import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
 
 import java.util.List;
 

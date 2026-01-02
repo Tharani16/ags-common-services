@@ -1,8 +1,8 @@
 package com.asg.common.services.repository;
 
-import com.asg.common.services.dto.GlobalTermsDto;
-import com.asg.common.services.dto.GlobalTermsInsertRequestDto;
-import com.asg.common.services.dto.GlobalTermsResponseDto;
+import com.asg.common.lib.dto.GlobalTermsDto;
+import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
+import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
