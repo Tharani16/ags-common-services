@@ -53,7 +53,7 @@ class UserPreferenceControllerTest {
         );
         when(userPreferenceService.getUserPreferences()).thenReturn(preferences);
 
-        mockMvc.perform(get("/api/v1/user-preference"))
+        mockMvc.perform(get("/v1/user-preference"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("User preferences fetched successfully"));
 
@@ -64,7 +64,7 @@ class UserPreferenceControllerTest {
     void getUserPreferences_Exception() throws Exception {
         when(userPreferenceService.getUserPreferences()).thenThrow(new RuntimeException("Database error"));
 
-        mockMvc.perform(get("/api/v1/user-preference"))
+        mockMvc.perform(get("/v1/user-preference"))
                 .andExpect(status().isInternalServerError());
 
         verify(userPreferenceService, times(1)).getUserPreferences();
@@ -77,7 +77,7 @@ class UserPreferenceControllerTest {
         ));
         doNothing().when(userPreferenceService).updateUserPreferences(any());
 
-        mockMvc.perform(put("/api/v1/user-preference")
+        mockMvc.perform(put("/v1/user-preference")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -93,7 +93,7 @@ class UserPreferenceControllerTest {
         ));
         doThrow(new RuntimeException("Update failed")).when(userPreferenceService).updateUserPreferences(any());
 
-        mockMvc.perform(put("/api/v1/user-preference")
+        mockMvc.perform(put("/v1/user-preference")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isInternalServerError());
@@ -109,7 +109,7 @@ class UserPreferenceControllerTest {
         );
         when(userPreferenceService.getRecentMenus()).thenReturn(recentMenus);
 
-        mockMvc.perform(get("/api/v1/user-preference/recent-menu"))
+        mockMvc.perform(get("/v1/user-preference/recent-menu"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Recent menu list fetched successfully"));
 
@@ -120,7 +120,7 @@ class UserPreferenceControllerTest {
     void getRecentMenus_Exception() throws Exception {
         when(userPreferenceService.getRecentMenus()).thenThrow(new RuntimeException("Fetch failed"));
 
-        mockMvc.perform(get("/api/v1/user-preference/recent-menu"))
+        mockMvc.perform(get("/v1/user-preference/recent-menu"))
                 .andExpect(status().isInternalServerError());
 
         verify(userPreferenceService, times(1)).getRecentMenus();
@@ -131,7 +131,7 @@ class UserPreferenceControllerTest {
         UpdateRecentMenuRequest request = new UpdateRecentMenuRequest("DOC123", true);
         doNothing().when(userPreferenceService).updateRecentMenu(anyString(), anyBoolean());
 
-        mockMvc.perform(put("/api/v1/user-preference/recent-menu")
+        mockMvc.perform(put("/v1/user-preference/recent-menu")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -145,7 +145,7 @@ class UserPreferenceControllerTest {
         UpdateRecentMenuRequest request = new UpdateRecentMenuRequest("DOC123", true);
         doThrow(new RuntimeException("Update failed")).when(userPreferenceService).updateRecentMenu(anyString(), anyBoolean());
 
-        mockMvc.perform(put("/api/v1/user-preference/recent-menu")
+        mockMvc.perform(put("/v1/user-preference/recent-menu")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isInternalServerError());

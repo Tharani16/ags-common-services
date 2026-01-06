@@ -49,7 +49,7 @@ class DashboardControllerTest {
             when(dashboardService.fetchUserSubmitStatus(anyString(), anyString(), any(), any()))
                     .thenReturn(expected);
 
-            mockMvc.perform(get("/api/v1/dashboard/submit-status")
+            mockMvc.perform(get("/v1/dashboard/submit-status")
                             .param("documentId", "DOC-001")
                             .param("actionRequested", "APPROVE"))
                     .andExpect(status().isOk());
@@ -66,7 +66,7 @@ class DashboardControllerTest {
             when(dashboardService.fetchRecentDocuments(anyString(), anyLong()))
                     .thenReturn(expected);
 
-            mockMvc.perform(get("/api/v1/dashboard/recent-documents")
+            mockMvc.perform(get("/v1/dashboard/recent-documents")
                             .param("documentId", "DOC-001")
                             .param("actionRequested", "VIEW"))
                     .andExpect(status().isOk());
@@ -83,7 +83,7 @@ class DashboardControllerTest {
             when(dashboardService.fetchFavoriteMenu(anyString(), anyLong()))
                     .thenReturn(expected);
 
-            mockMvc.perform(get("/api/v1/dashboard/favorite-menu")
+            mockMvc.perform(get("/v1/dashboard/favorite-menu")
                             .param("documentId", "DOC-001")
                             .param("actionRequested", "VIEW"))
                     .andExpect(status().isOk());
@@ -99,7 +99,7 @@ class DashboardControllerTest {
             when(dashboardService.fetchApprovalPendingList(anyString(), anyString(), any(), any()))
                     .thenReturn(expected);
 
-            mockMvc.perform(get("/api/v1/dashboard/approval-pending-list")
+            mockMvc.perform(get("/v1/dashboard/approval-pending-list")
                             .param("fromDate", "2024-01-01")
                             .param("toDate", "2024-12-31")
                             .param("documentId", "DOC-001")
@@ -117,7 +117,7 @@ class DashboardControllerTest {
             when(dashboardService.fetchWeeklyTransactions(anyString(), anyString(), anyString()))
                     .thenReturn(expected);
 
-            mockMvc.perform(get("/api/v1/dashboard/weekly-transactions")
+            mockMvc.perform(get("/v1/dashboard/weekly-transactions")
                             .param("periodFrom", "2024-01-01")
                             .param("periodTo", "2024-01-07")
                             .param("documentId", "DOC-001")
