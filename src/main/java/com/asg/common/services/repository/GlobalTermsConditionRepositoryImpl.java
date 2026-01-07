@@ -150,7 +150,7 @@ public class GlobalTermsConditionRepositoryImpl implements GlobalTermsConditionR
         try {
             while (rs.next()) {
                 GlobalTermsDto dto = new GlobalTermsDto();
-                dto.setRefTermsPoid(rs.getLong("REF_TERMS_POID"));
+                dto.setRefTermsPoid(rs.getLong("TERMS_POID"));
                 dto.setDetRowId(rs.getLong("DET_ROW_ID"));
                 dto.setClauseNo(rs.getString("CLAUSE_NO"));
                 dto.setClauseDetails(rs.getString("CLAUSE_DETAILS"));

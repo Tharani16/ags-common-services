@@ -154,13 +154,13 @@ public class CommonDataServiceController {
     )
     @GetMapping("/term-condition/load")
     public ResponseEntity<?> loadGlobalTermsList(
-            @Parameter(description = "Document ID", required = true, example = "PO-1001")
-            @RequestParam String documentId,
+            @Parameter(description = "Document ID", example = "PO-1001")
+            @RequestParam(required = false) String documentId,
 
-            @Parameter(description = "Document Key POID", required = true, example = "2001")
-            @RequestParam Long docKeyPoid,
+            @Parameter(description = "Document Key POID", example = "2001")
+            @RequestParam(required = false) Long docKeyPoid,
 
-            @Parameter(description = "Terms POID (optional filter)", required = false, example = "10")
+            @Parameter(description = "Terms POID (optional filter)", example = "10")
             @RequestParam(required = false) Long termsPoid
     ) {
 
