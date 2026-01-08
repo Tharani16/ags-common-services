@@ -1,6 +1,6 @@
 package com.asg.common.services.service.impl;
 
-import com.asg.common.services.dto.GlPostingViewResponseDto;
+import com.asg.common.lib.dto.response.GlPostingViewResponseDto;
 import com.asg.common.services.repository.GlPostingRepository;
 import com.asg.common.services.service.GlPostingService;
 import lombok.RequiredArgsConstructor;

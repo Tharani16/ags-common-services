@@ -1,7 +1,10 @@
 package com.asg.common.services.controller;
 
-import com.asg.common.lib.annotation.AllowedAction;
-import com.asg.common.lib.enums.UserRolesRightsEnum;
+import com.asg.common.lib.dto.GLMasterCommonDTO;
+import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
+import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
+import com.asg.common.lib.dto.response.StockDetailsResponse;
+import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
 import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.*;
 import com.asg.common.services.service.CommonDataService;
@@ -151,13 +154,13 @@ public class CommonDataServiceController {
     )
     @GetMapping("/term-condition/load")
     public ResponseEntity<?> loadGlobalTermsList(
-            @Parameter(description = "Document ID", required = true, example = "PO-1001")
-            @RequestParam String documentId,
+            @Parameter(description = "Document ID", example = "PO-1001")
+            @RequestParam(required = false) String documentId,
 
-            @Parameter(description = "Document Key POID", required = true, example = "2001")
-            @RequestParam Long docKeyPoid,
+            @Parameter(description = "Document Key POID", example = "2001")
+            @RequestParam(required = false) Long docKeyPoid,
 
-            @Parameter(description = "Terms POID (optional filter)", required = false, example = "10")
+            @Parameter(description = "Terms POID (optional filter)", example = "10")
             @RequestParam(required = false) Long termsPoid
     ) {
 
@@ -244,6 +247,23 @@ public class CommonDataServiceController {
         StockDetailsResponse response = glMasterService.getStockDetails(stockPoid);
 
         return success("Stock details fetched successfully", response);
+    }
+
+    @PostMapping("/po/create-from-rfq")
+    public ResponseEntity<?> createPoFromRfq(
+            @RequestParam Long poPoid,
+            @RequestParam String supplierPoid,
+            @RequestParam String rfqPoid
+    ) {
+        String result = glMasterService.createPoFromRfq(
+                UserContext.getGroupPoid(),
+                UserContext.getUserPoid(),
+                UserContext.getCompanyPoid(),
+                poPoid,
+                supplierPoid,
+                rfqPoid
+        );
+        return success("PO created from RFQ", result);
     }
 
 }

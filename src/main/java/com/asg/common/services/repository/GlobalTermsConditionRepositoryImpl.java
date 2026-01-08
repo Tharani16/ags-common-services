@@ -1,8 +1,8 @@
 package com.asg.common.services.repository;
 
-import com.asg.common.services.dto.GlobalTermsDto;
-import com.asg.common.services.dto.GlobalTermsInsertRequestDto;
-import com.asg.common.services.dto.GlobalTermsResponseDto;
+import com.asg.common.lib.dto.GlobalTermsDto;
+import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
+import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
@@ -150,7 +150,7 @@ public class GlobalTermsConditionRepositoryImpl implements GlobalTermsConditionR
         try {
             while (rs.next()) {
                 GlobalTermsDto dto = new GlobalTermsDto();
-                dto.setRefTermsPoid(rs.getLong("REF_TERMS_POID"));
+                dto.setRefTermsPoid(rs.getLong("TERMS_POID"));
                 dto.setDetRowId(rs.getLong("DET_ROW_ID"));
                 dto.setClauseNo(rs.getString("CLAUSE_NO"));
                 dto.setClauseDetails(rs.getString("CLAUSE_DETAILS"));

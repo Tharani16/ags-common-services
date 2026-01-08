@@ -1,6 +1,7 @@
 package com.asg.common.services.controller;
 
-import com.asg.common.services.dto.GlPostingViewResponseDto;
+import com.asg.common.lib.security.util.UserContext;
+import com.asg.common.lib.dto.response.GlPostingViewResponseDto;
 import com.asg.common.services.dto.GlrePostingDto;
 import com.asg.common.services.service.GlPostingService;
 import io.swagger.v3.oas.annotations.Operation;
