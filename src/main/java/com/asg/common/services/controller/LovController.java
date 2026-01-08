@@ -1898,7 +1898,7 @@ public class LovController {
             Map<String, Object> result;
 
             if ("BANK_MASTER".equals(lovType)) {
-                result = lovService.getBankMasterLov(filter, groupPoid, companyPoid, userPoid, page, size, sortField, sortOrder);
+                result = lovService.getBankMasterLov(filter, groupPoid, companyPoid, userPoid, page, size, sortField, sortOrder, filterField);
             } else {
                 result = lovService.getLovList(filter, groupPoid, companyPoid, userPoid, lovType, page, size, sortField, sortOrder, defaultCode, defaultPoid, filterField);
             }
