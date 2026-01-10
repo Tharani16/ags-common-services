@@ -47,7 +47,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Value("${attachments.base-path:/opt/app/attachments/}")
     private String basePath;
 
-    @Value("${attachments.allowed-extensions:pdf,txt,csv,jpg,jpeg,png,bmp,gif,doc,docx}")
+    @Value("${attachments.allowed-extensions:pdf,txt,csv,jpg,jpeg,png,bmp,gif,doc,docx,xls,xlsx}")
     private String allowedExtensions;
 
     @Override
