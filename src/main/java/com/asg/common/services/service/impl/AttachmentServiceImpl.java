@@ -137,7 +137,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 existingFileNames.add(originalName);
                 
                 // Log attachment upload
-                loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_UPLOADED, docId, docKeyPoid.toString());
+                loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_UPLOADED, docId, docKeyPoid.toString());
 
             } catch (Exception ex) {
                 log.error("Upload failed for {}: {}", file.getOriginalFilename(), ex.getMessage(), ex);
@@ -255,8 +255,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
         }
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, "(ALL)");
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DELETED, docId, docKeyPoid.toString());
-
+        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_DELETED, docId, docKeyPoid.toString());
     }
 
     @Override
