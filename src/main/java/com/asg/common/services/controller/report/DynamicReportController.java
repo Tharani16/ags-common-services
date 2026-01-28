@@ -1,6 +1,8 @@
 package com.asg.common.services.controller.report;
 
+import com.asg.common.lib.annotation.AllowedAction;
 import com.asg.common.lib.dto.excel.ExcelFileData;
+import com.asg.common.lib.enums.UserRolesRightsEnum;
 import com.asg.common.lib.service.DynamicReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ public class DynamicReportController {
 
     private final DynamicReportService dynamicReportService;
 
+    @AllowedAction(UserRolesRightsEnum.PRINT)
     @PostMapping("/export/excel")
     public ResponseEntity<byte[]> exportToExcel(
             @RequestParam String rptDocId,
