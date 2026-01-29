@@ -38,6 +38,7 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 	<parameter name="COMPANY_POID" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
+	<parameter name="COMPANY_POID_CSV" class="java.lang.String"/>
     <parameter name="COMPANY_POID_LIST" class="java.util.Collection"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["\\\\10.100.100.159\\ERP_Reports\\Reports\\"]]></defaultValueExpression>
@@ -89,7 +90,15 @@ FROM
                   AND GLB.GL_POID = $P{GL_POID}
                   AND  (NVL(GLB.LINE_POID,'0') LIKE DECODE(NVL($P{LINE_POID},'0'),'0','%','NULL','%',$P{LINE_POID})
                         OR NVL(GLB.LINE_POID,'0') NOT IN DECODE($P{LINE_POID},'100000','126'))
-AND $X{IN, GLB.GL_COMPANY_POID, COMPANY_POID_LIST}
+AND (
+    $P{COMPANY_POID_CSV} IS NULL
+    OR INSTR(',' || $P{COMPANY_POID_CSV} || ',', ',999,') > 0
+    OR GLB.GL_COMPANY_POID IN (
+        SELECT TO_NUMBER(REGEXP_SUBSTR($P{COMPANY_POID_CSV}, '[^,]+', 1, LEVEL))
+        FROM DUAL
+        CONNECT BY REGEXP_SUBSTR($P{COMPANY_POID_CSV}, '[^,]+', 1, LEVEL) IS NOT NULL
+    )
+)
                   AND TRUNC(GLB.TRANSACTION_DATE) <=  TO_DATE($P{AS_ON_DATE},'DD-MON-YYYY')
                   ORDER BY GLB.GL_POID, NVL(GLB.BILL_DUE_DATE, TRANSACTION_DATE)
       )

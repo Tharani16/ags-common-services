@@ -3,6 +3,9 @@ package com.asg.common.services.service;
 import com.asg.common.lib.service.PrintService;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JasperReport;
+import oracle.jdbc.driver.OracleConnection;
+import oracle.sql.ARRAY;
+import oracle.sql.ArrayDescriptor;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -25,7 +28,7 @@ public class DynamicReportPrintService {
         Map<String, Object> params = printService.buildBaseParams(null, docId);
         JasperReport mainReport = getReportConfig(docId, params);
         if (rptParams != null) {
-            convertCompanyPoidParam(rptParams);
+            convertCompanyPoidParam(rptParams, docId);
             convertDateParams(rptParams);
             params.putAll(rptParams);
         }
@@ -33,26 +36,18 @@ public class DynamicReportPrintService {
     }
 
     /**
-     * From FE, we are getting Values like  "COMPANY_POID": "ARRAY[999,12]",
-     * So adding a logic to Change it to   "COMPANY_POID_LIST": [999, 12],
+     * Handle COMPANY_POID parameter - create appropriate types for different reports
      */
-    private void convertCompanyPoidParam(Map<String, Object> params) {
+    private void convertCompanyPoidParam(Map<String, Object> params, String docId) throws Exception {
         Object raw = params.get("COMPANY_POID");
-        if (raw instanceof String s && s.startsWith("ARRAY[")) {
-            // Strip ARRAY[...] and split
-            String inside = s.substring(6, s.length() - 1); // "999,12"
-            List<Long> companyIds = Arrays.stream(inside.split(","))
-                    .map(String::trim)
-                    .map(Long::valueOf)
+        if (raw instanceof List<?> list) {
+            List<Long> companyIds = list.stream()
+                    .map(obj -> obj instanceof Number ? ((Number) obj).longValue() : Long.valueOf(obj.toString()))
                     .toList();
-            // Handle special "all companies" logic
-            if (companyIds.isEmpty() || companyIds.contains(999L)) {
-                params.put("COMPANY_POID_LIST", new ArrayList<>());
-            } else {
-                params.put("COMPANY_POID_LIST", companyIds);
-            }
-            // Do not Remove COMPANY_POID as it is there in JRXMLs
-            //params.remove("COMPANY_POID");
+            params.put("COMPANY_POID_LIST", companyIds);
+            params.put("COMPANY_POID_CSV", companyIds.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(",")));
         }
     }
     

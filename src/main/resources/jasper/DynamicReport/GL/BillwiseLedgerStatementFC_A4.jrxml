@@ -37,6 +37,7 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 	<parameter name="COMPANY_POID" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
+	<parameter name="COMPANY_POID_CSV" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["\\\\shippingbahrain.com\\data\\ERP_REPORTS\\Reports\\"]]></defaultValueExpression>
 	</parameter>
@@ -51,9 +52,7 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 	<parameter name="CUR_RATE" class="java.lang.String"/>
 	<queryString language="plsql">
 		<![CDATA[{call PROC_GL_BILLWISE_STMNT_FC_PRNT(
-			CASE WHEN $P{COMPANY_POID} LIKE 'ARRAY[%]' THEN 
-				TO_NUMBER(TRIM(REGEXP_SUBSTR(REPLACE(REPLACE($P{COMPANY_POID}, 'ARRAY[', ''), ']', ''), '[^,]+', 1, 1)))
-			ELSE TO_NUMBER($P{COMPANY_POID}) END, 
+			$P{COMPANY_POID_CSV}, 
 			$P{GL_POID}, $P{AS_ON_DATE}, $P{DR_CR_OPTION}, $P{PRINT_OPTION}, 
 			$P{LINE}, $P{COST_POID}, $P{CUR_CODE}, $P{CUR_RATE}, $P{ORACLE_REF_CURSOR}
 		)}]]>
