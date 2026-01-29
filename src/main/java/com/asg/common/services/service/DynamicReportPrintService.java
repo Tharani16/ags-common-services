@@ -45,11 +45,9 @@ public class DynamicReportPrintService {
                     .map(String::trim)
                     .map(Long::valueOf)
                     .toList();
-            //params.put("COMPANY_POID_LIST", companyIds);
             // Handle special "all companies" logic
             if (companyIds.isEmpty() || companyIds.contains(999L)) {
                 params.put("COMPANY_POID_LIST", new ArrayList<>());
-                // Optionally: params.put("ALL_COMPANIES", "Y");
             } else {
                 params.put("COMPANY_POID_LIST", companyIds);
             }

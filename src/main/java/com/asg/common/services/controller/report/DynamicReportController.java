@@ -25,7 +25,7 @@ public class DynamicReportController {
             @RequestParam String rptDocId,
             @RequestParam String rptName,
             @RequestBody(required = false) Map<String, Object> filters) {
-        ExcelFileData excelData = dynamicReportService.exportToExcel(rptDocId, filters, rptName);
+        ExcelFileData excelData = dynamicReportService.exportToExcel(rptDocId.trim(), filters, rptName);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + excelData.getFileName() + "\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
