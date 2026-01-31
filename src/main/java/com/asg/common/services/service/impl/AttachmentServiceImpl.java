@@ -334,15 +334,35 @@ public class AttachmentServiceImpl implements AttachmentService {
                     throw new ResourceNotFoundException("Attachment", "seqNo", u.getSeqNo().toString());
                 }
             }
-            
+            // -------- FIX : Resolve filename by seqNo only --------
+            AttachmentDto existingAttachment = getAttachmentBySeqNo(
+                    actualDocId,
+                    u.getDocKeyPoid(),
+                    u.getSeqNo()
+            );
+
+            String resolvedFileName =
+                    (u.getOriginalFileName() != null && !u.getOriginalFileName().isBlank())
+                            ? u.getOriginalFileName()
+                            : existingAttachment.getOriginalFileName();
+
             attachmentRepository.updateAttachment(
                     getGroupPoid(), 1L, actualDocId, u.getDocKeyPoid(), u.getSeqNo(),
-                    u.getOriginalFileName(), u.getRemarks(), u.getChecklistName(),
+                    existingAttachment.getOriginalFileName(),
+                    u.getRemarks(), u.getChecklistName(),
                     getUserPoid(), fileNameMapped
             );
-            
+
             // Log attachment update
-            loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_UPDATED, actualDocId, u.getDocKeyPoid().toString());
+            loggingService.createLogSummaryEntry(
+                    actualDocId,
+                    u.getDocKeyPoid().toString(),
+                    "Attachment comments updated, File Name : " + resolvedFileName
+                            + (u.getRemarks() != null && !u.getRemarks().isBlank()
+                            ? ", Remarks : " + u.getRemarks()
+                            : "")
+            );
+
         }
         
         entityManager.flush();
