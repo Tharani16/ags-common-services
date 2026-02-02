@@ -1,9 +1,11 @@
 package com.asg.common.services.service.impl;
 
 import com.asg.common.lib.enums.AttachmentFilterType;
+import com.asg.common.lib.enums.LogDetailsEnum;
 import com.asg.common.lib.exception.AsgException;
 import com.asg.common.lib.exception.ResourceNotFoundException;
 import com.asg.common.lib.security.util.UserContext;
+import com.asg.common.lib.service.LoggingService;
 import com.asg.common.services.dto.AttachmentDto;
 import com.asg.common.services.dto.AttachmentUploadDto;
 import com.asg.common.services.dto.UpdateRemarksRequest;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -41,13 +44,16 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
 
+    @Autowired
+    private LoggingService loggingService;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Value("${attachments.base-path:/opt/app/attachments/}")
     private String basePath;
 
-    @Value("${attachments.allowed-extensions:pdf,txt,csv,jpg,jpeg,png,bmp,gif,doc,docx,xls,xlsx}")
+    @Value("${attachments.allowed-extensions:pdf,txt,csv,jpg,jpeg,png,bmp,gif,doc,docx,xls,xlsx,ppt,pptx}")
     private String allowedExtensions;
 
     @Override
@@ -129,6 +135,9 @@ public class AttachmentServiceImpl implements AttachmentService {
 
                 uploaded.add(buildDto(docKeyPoid, originalName, storedName, remarks, checklistName, createdBy.toString(), new Date(), true));
                 existingFileNames.add(originalName);
+                
+                // Log attachment upload
+                loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_UPLOADED, docId, docKeyPoid.toString());
 
             } catch (Exception ex) {
                 log.error("Upload failed for {}: {}", file.getOriginalFilename(), ex.getMessage(), ex);
@@ -230,6 +239,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
 
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, fileNameMapped);
+        
+        // Log attachment deletion
+        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DELETED, docId, docKeyPoid.toString());
     }
 
     @Override
@@ -243,6 +255,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
         }
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, "(ALL)");
+        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_DELETED, docId, docKeyPoid.toString());
     }
 
     @Override
@@ -256,6 +269,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         
         // Call existing archive procedure
         attachmentRepository.archiveAttachment(getGroupPoid(), 1L, docId, docKeyPoid, fileNameMapped);
+        
+        // Log attachment archiving
+        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_ARCHIVED, docId, docKeyPoid.toString());
         
         // Generate archived filename with timestamp (format: ddMMyyyyHHmm_originalname)
         String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyyHHmm"));
@@ -318,12 +334,35 @@ public class AttachmentServiceImpl implements AttachmentService {
                     throw new ResourceNotFoundException("Attachment", "seqNo", u.getSeqNo().toString());
                 }
             }
-            
+            // -------- FIX : Resolve filename by seqNo only --------
+            AttachmentDto existingAttachment = getAttachmentBySeqNo(
+                    actualDocId,
+                    u.getDocKeyPoid(),
+                    u.getSeqNo()
+            );
+
+            String resolvedFileName =
+                    (u.getOriginalFileName() != null && !u.getOriginalFileName().isBlank())
+                            ? u.getOriginalFileName()
+                            : existingAttachment.getOriginalFileName();
+
             attachmentRepository.updateAttachment(
                     getGroupPoid(), 1L, actualDocId, u.getDocKeyPoid(), u.getSeqNo(),
-                    u.getOriginalFileName(), u.getRemarks(), u.getChecklistName(),
+                    existingAttachment.getOriginalFileName(),
+                    u.getRemarks(), u.getChecklistName(),
                     getUserPoid(), fileNameMapped
             );
+
+            // Log attachment update
+            loggingService.createLogSummaryEntry(
+                    actualDocId,
+                    u.getDocKeyPoid().toString(),
+                    "Attachment comments updated, File Name : " + resolvedFileName
+                            + (u.getRemarks() != null && !u.getRemarks().isBlank()
+                            ? ", Remarks : " + u.getRemarks()
+                            : "")
+            );
+
         }
         
         entityManager.flush();
@@ -382,6 +421,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         if (!file.exists() || !file.canRead()) {
             throw new ResourceNotFoundException("File not found on server", "path", file.getAbsolutePath());
         }
+        
+        // Log attachment download
+        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DOWNLOADED, docId, docKeyPoid.toString());
 
         return new FileSystemResource(file);
     }
@@ -392,6 +434,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         Attachment a = attachmentRepository
                 .findByDocIdAndDocKeyPoidAndFileNameMappedForArchive(docId, docKeyPoid, fileNameMapped)
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment", "fileNameMapped", fileNameMapped));
+
+        // Log attachment viewed
+        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_VIEWED, docId, docKeyPoid.toString());
 
         return mapRowToDto(new Object[]{
                 a.getGroupPoid(), a.getCompanyPoid(), a.getDocId(),
