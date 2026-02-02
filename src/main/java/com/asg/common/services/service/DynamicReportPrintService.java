@@ -42,12 +42,22 @@ public class DynamicReportPrintService {
         Object raw = params.get("COMPANY_POID");
         if (raw instanceof List<?> list) {
             List<Long> companyIds = list.stream()
-                    .map(obj -> obj instanceof Number ? ((Number) obj).longValue() : Long.valueOf(obj.toString()))
+                    .map(obj -> obj instanceof Number ? ((Number) obj).longValue() : Long.parseLong(obj.toString()))
                     .toList();
-            params.put("COMPANY_POID_LIST", companyIds);
-            params.put("COMPANY_POID_CSV", companyIds.stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(",")));
+            // 999 - All Companies Check
+            boolean contains999 = companyIds.contains(999L);
+            if (companyIds.size() == 1 || contains999) {
+                // Backward Compatibility
+                params.put("COMPANY_POID", companyIds.getFirst());
+                // Adding CSV as well because we already changed query for Two Reports BillWise Statement and BillWise Statement FC
+                params.put("COMPANY_POID_CSV", companyIds.getFirst());
+            } else {
+                // Multiple values - add as CSV, Add First ID in COMPANY_POID as well to maintain existing logic
+                params.put("COMPANY_POID", companyIds.getFirst());
+                params.put("COMPANY_POID_CSV", companyIds.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(",")));
+            }
         }
     }
     

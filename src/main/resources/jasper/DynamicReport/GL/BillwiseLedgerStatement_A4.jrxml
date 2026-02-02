@@ -39,7 +39,6 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="COMPANY_POID_CSV" class="java.lang.String"/>
-    <parameter name="COMPANY_POID_LIST" class="java.util.Collection"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["\\\\10.100.100.159\\ERP_Reports\\Reports\\"]]></defaultValueExpression>
 	</parameter>
