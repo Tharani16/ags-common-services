@@ -20,7 +20,7 @@ public class StockServiceClient {
     private String financeServiceUrl;
     
     public StockInfoDto getStockInfo(Long stockPoid) {
-        String url = financeServiceUrl + "/api/stock-master/" + stockPoid;
+        String url = financeServiceUrl + "/v1/stock-master/" + stockPoid;
         ApiResponseWrapper<StockInfoDto> response = restClient.get(url, new ParameterizedTypeReference<ApiResponseWrapper<StockInfoDto>>() {});
         return RestClientUtil.extractData(response);
     }
