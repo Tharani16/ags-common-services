@@ -133,7 +133,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                     callEdiProc(groupPoid, companyPoid, docId, docKeyPoid, attachmentEDIJobPoid, loginUser);
                 }
 
-                uploaded.add(buildDto(docKeyPoid, originalName, storedName, remarks, checklistName, createdBy.toString(), new Date(), true));
+                uploaded.add(buildDto(docKeyPoid, originalName, storedName, remarks, checklistName,String.valueOf(createdBy != null ? createdBy : getUserPoid()), new Date(), true));
                 existingFileNames.add(originalName);
                 
                 // Log attachment upload
@@ -340,6 +340,16 @@ public class AttachmentServiceImpl implements AttachmentService {
                     u.getDocKeyPoid(),
                     u.getSeqNo()
             );
+            boolean remarksChanged =
+                    !Objects.equals(existingAttachment.getRemarks(), u.getRemarks());
+
+            boolean checklistChanged =
+                    !Objects.equals(existingAttachment.getChecklistName(), u.getChecklistName());
+
+            if (!remarksChanged && !checklistChanged) {
+                log.info("No changes detected for attachment seqNo={}, skipping update & log", u.getSeqNo());
+                continue;
+            }
 
             String resolvedFileName =
                     (u.getOriginalFileName() != null && !u.getOriginalFileName().isBlank())
@@ -354,14 +364,23 @@ public class AttachmentServiceImpl implements AttachmentService {
             );
 
             // Log attachment update
+            StringBuilder logMsg = new StringBuilder(
+                    "Attachment comments updated, File Name : " + resolvedFileName
+            );
+
+            if (remarksChanged) {
+                logMsg.append(", Remarks : ").append(u.getRemarks());
+            }
+            if (checklistChanged) {
+                logMsg.append(", Check List Name : ").append(u.getChecklistName());
+            }
+
             loggingService.createLogSummaryEntry(
                     actualDocId,
                     u.getDocKeyPoid().toString(),
-                    "Attachment comments updated, File Name : " + resolvedFileName
-                            + (u.getRemarks() != null && !u.getRemarks().isBlank()
-                            ? ", Remarks : " + u.getRemarks()
-                            : "")
+                    logMsg.toString()
             );
+
 
         }
         
