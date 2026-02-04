@@ -442,7 +442,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
         
         // Log attachment download
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DOWNLOADED, docId, docKeyPoid.toString());
+        // loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DOWNLOADED, docId, docKeyPoid.toString());
 
         return new FileSystemResource(file);
     }
