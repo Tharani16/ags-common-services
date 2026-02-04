@@ -302,52 +302,67 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     @Transactional
     public void updateRemarksAndChecklist(String docId, List<UpdateRemarksRequest> updates) {
+
         validateDocId(docId);
-        
+
         if (updates == null || updates.isEmpty()) {
             throw new IllegalArgumentException("Updates list cannot be null or empty");
         }
 
+        StringBuilder finalLogMsg = new StringBuilder();
+        boolean shouldLog = false;
+        Long docKeyPoidForLog = null;
+        String actualDocIdForLog = docId;
+
         for (UpdateRemarksRequest u : updates) {
+
             if (u.getDocKeyPoid() == null || u.getDocKeyPoid() <= 0) {
                 throw new IllegalArgumentException("Doc Key Poid is required for update");
-               // continue;
             }
             if (u.getSeqNo() == null || u.getSeqNo() <= 0) {
                 throw new IllegalArgumentException("Seq No is required for update");
             }
-            
-            String actualDocId = (u.getDocId() != null && !u.getDocId().trim().isEmpty()) ? u.getDocId() : docId;
+
+            String actualDocId =
+                    (u.getDocId() != null && !u.getDocId().trim().isEmpty())
+                            ? u.getDocId()
+                            : docId;
+
             String fileNameMapped = u.getFileNameMapped();
-            
-            // If fileNameMapped is null, empty, or a placeholder, find it using seqNo
-            if (fileNameMapped == null || fileNameMapped.trim().isEmpty() || fileNameMapped.startsWith("PLACEHOLDER_")) {
-                // Find the attachment by docId, docKeyPoid, and seqNo to get the actual fileNameMapped
-                List<AttachmentDto> attachments = getActiveAttachments(actualDocId, u.getDocKeyPoid());
-                Optional<AttachmentDto> targetAttachment = attachments.stream()
-                    .filter(att -> att.getSeqNo() != null && att.getSeqNo().equals(u.getSeqNo()))
-                    .findFirst();
-                    
-                if (targetAttachment.isPresent()) {
-                    fileNameMapped = targetAttachment.get().getStoredFileName();
-                } else {
-                    throw new ResourceNotFoundException("Attachment", "seqNo", u.getSeqNo().toString());
-                }
+
+            if (fileNameMapped == null || fileNameMapped.trim().isEmpty()
+                    || fileNameMapped.startsWith("PLACEHOLDER_")) {
+
+                List<AttachmentDto> attachments =
+                        getActiveAttachments(actualDocId, u.getDocKeyPoid());
+
+                AttachmentDto targetAttachment = attachments.stream()
+                        .filter(att -> att.getSeqNo() != null
+                                && att.getSeqNo().equals(u.getSeqNo()))
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Attachment", "seqNo", u.getSeqNo().toString()));
+
+                fileNameMapped = targetAttachment.getStoredFileName();
             }
-            // -------- FIX : Resolve filename by seqNo only --------
+
             AttachmentDto existingAttachment = getAttachmentBySeqNo(
                     actualDocId,
                     u.getDocKeyPoid(),
                     u.getSeqNo()
             );
+
             boolean remarksChanged =
                     !Objects.equals(existingAttachment.getRemarks(), u.getRemarks());
 
             boolean checklistChanged =
-                    !Objects.equals(existingAttachment.getChecklistName(), u.getChecklistName());
+                    !Objects.equals(existingAttachment.getChecklistName(),
+                            u.getChecklistName());
 
             if (!remarksChanged && !checklistChanged) {
-                log.info("No changes detected for attachment seqNo={}, skipping update & log", u.getSeqNo());
+                log.info("No changes detected for attachment seqNo={}, skipping update & log",
+                        u.getSeqNo());
                 continue;
             }
 
@@ -357,35 +372,52 @@ public class AttachmentServiceImpl implements AttachmentService {
                             : existingAttachment.getOriginalFileName();
 
             attachmentRepository.updateAttachment(
-                    getGroupPoid(), 1L, actualDocId, u.getDocKeyPoid(), u.getSeqNo(),
+                    getGroupPoid(),
+                    1L,
+                    actualDocId,
+                    u.getDocKeyPoid(),
+                    u.getSeqNo(),
                     existingAttachment.getOriginalFileName(),
-                    u.getRemarks(), u.getChecklistName(),
-                    getUserPoid(), fileNameMapped
+                    u.getRemarks(),
+                    u.getChecklistName(),
+                    getUserPoid(),
+                    fileNameMapped
             );
 
-            // Log attachment update
-            StringBuilder logMsg = new StringBuilder(
-                    "Attachment comments updated, File Name : " + resolvedFileName
-            );
+
+            if (shouldLog) {
+                finalLogMsg.append(" | ");
+            }
+
+            finalLogMsg.append("Attachment comments updated, File Name : ")
+                    .append(resolvedFileName);
 
             if (remarksChanged) {
-                logMsg.append(", Remarks : ").append(u.getRemarks());
+                finalLogMsg.append(", Remarks : ")
+                        .append(u.getRemarks() != null ? u.getRemarks() : "");
             }
+
             if (checklistChanged) {
-                logMsg.append(", Check List Name : ").append(u.getChecklistName());
+                finalLogMsg.append(", Check List Name : ")
+                        .append(u.getChecklistName() != null ? u.getChecklistName() : "");
             }
 
-            loggingService.createLogSummaryEntry(
-                    actualDocId,
-                    u.getDocKeyPoid().toString(),
-                    logMsg.toString()
-            );
-
-
+            shouldLog = true;
+            docKeyPoidForLog = u.getDocKeyPoid();
+            actualDocIdForLog = actualDocId;
         }
-        
+
+        if (shouldLog) {
+            loggingService.createLogSummaryEntry(
+                    actualDocIdForLog,
+                    docKeyPoidForLog.toString(),
+                    finalLogMsg.toString()
+            );
+        }
+
         entityManager.flush();
     }
+
 
     /*@Override
     @Transactional
