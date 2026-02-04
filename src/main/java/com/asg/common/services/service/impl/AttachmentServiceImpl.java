@@ -248,12 +248,19 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Transactional
     public void deleteAllAttachments(String docId, Long docKeyPoid) {
         validateDoc(docId, docKeyPoid);
-        
-        // Check if any attachments exist for the given docId and docKeyPoid
-        List<AttachmentDto> existingAttachments = getActiveAttachments(docId, docKeyPoid);
-        if (existingAttachments.isEmpty()) {
-            throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
+
+        List<Object[]> existingAttachments =
+                attachmentRepository.fetchAllAttachments(
+                        getGroupPoid(), 1L, docId, docKeyPoid
+                );
+
+        if (existingAttachments == null || existingAttachments.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Attachments", "parameters",
+                    "docId=" + docId + ", docKeyPoid=" + docKeyPoid
+            );
         }
+
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, "(ALL)");
         loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_DELETED, docId, docKeyPoid.toString());
     }
