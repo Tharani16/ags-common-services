@@ -363,16 +363,16 @@ public class AttachmentServiceImpl implements AttachmentService {
                     getUserPoid(), fileNameMapped
             );
 
-            // Log attachment update
+            // Log attachment update - single consolidated log
             StringBuilder logMsg = new StringBuilder(
                     "Attachment comments updated, File Name : " + resolvedFileName
             );
 
             if (remarksChanged) {
-                logMsg.append(", Remarks : ").append(u.getRemarks());
+                logMsg.append(", Remarks : ").append(u.getRemarks() != null ? u.getRemarks() : "");
             }
             if (checklistChanged) {
-                logMsg.append(", Check List Name : ").append(u.getChecklistName());
+                logMsg.append(", Check List Name : ").append(u.getChecklistName() != null ? u.getChecklistName() : "");
             }
 
             loggingService.createLogSummaryEntry(
