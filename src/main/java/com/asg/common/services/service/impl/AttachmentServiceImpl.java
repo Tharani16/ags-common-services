@@ -197,7 +197,19 @@ public class AttachmentServiceImpl implements AttachmentService {
     public List<AttachmentDto> getActiveAttachments(String docId, Long docKeyPoid) {
         validateDoc(docId, docKeyPoid);
 
-        return attachmentRepository.fetchActiveAttachments(getGroupPoid(), 1L, docId, docKeyPoid)
+        return attachmentRepository.fetchAllAttachments(getGroupPoid(), 1L, docId, docKeyPoid)
+                .stream()
+                .map(this::mapRowToDto)
+                .sorted(Comparator.comparing(AttachmentDto::getSeqNo, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AttachmentDto> getAllAttachments(String docId, Long docKeyPoid) {
+        validateDoc(docId, docKeyPoid);
+
+        return attachmentRepository.fetchAllAttachments(getGroupPoid(), UserContext.getCompanyPoid(), docId, docKeyPoid)
                 .stream()
                 .map(this::mapRowToDto)
                 .sorted(Comparator.comparing(AttachmentDto::getSeqNo, Comparator.nullsLast(Comparator.naturalOrder())))
@@ -250,7 +262,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         validateDoc(docId, docKeyPoid);
         
         // Check if any attachments exist for the given docId and docKeyPoid
-        List<AttachmentDto> existingAttachments = getActiveAttachments(docId, docKeyPoid);
+        List<AttachmentDto> existingAttachments = getAllAttachments(docId, docKeyPoid);
         if (existingAttachments.isEmpty()) {
             throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
         }
