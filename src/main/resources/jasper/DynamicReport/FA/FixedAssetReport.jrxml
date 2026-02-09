@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FixedAssetReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="83312909-d818-4329-b009-d3de853d30f6">
+	<property name="ireport.zoom" value="0.9090909090909096"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="LOGIN_GROUP_POID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUB_FOOTER" class="net.sf.jasperreports.engine.JasperReport"/>
+	<parameter name="SUB_HEADER" class="net.sf.jasperreports.engine.JasperReport"/>
+	<parameter name="LOGIN_COMP_POID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOGIN_USER_POID" class="java.lang.String"/>
+	<parameter name="DOC_ID" class="java.lang.String"/>
+	<parameter name="DOC_KEY_POID" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["////10.100.100.3//erp_reports//Reports//"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT1" class="net.sf.jasperreports.engine.JasperReport"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT COMPANY_POID, FA_CODE, FA_DESCRIPTION, ASSET_TYPE, FA_OWNER, PURCHASE_DATE, INVOICE_NO, GROSS_VALUE,
+REGISTRATION_NO, ENGINE_CHASIS_NO, BRAND, VEHICLE_TYPE
+FROM FIXED_ASSET_MASTER
+WHERE FA_POID=$P{DOC_KEY_POID}]]>
+	</queryString>
+	<field name="FA_CODE" class="java.lang.String"/>
+	<field name="FA_DESCRIPTION" class="java.lang.String"/>
+	<field name="ASSET_TYPE" class="java.lang.String"/>
+	<field name="FA_OWNER" class="java.lang.String"/>
+	<field name="PURCHASE_DATE" class="java.sql.Timestamp"/>
+	<field name="INVOICE_NO" class="java.lang.String"/>
+	<field name="GROSS_VALUE" class="java.math.BigDecimal"/>
+	<field name="REGISTRATION_NO" class="java.lang.String"/>
+	<field name="ENGINE_CHASIS_NO" class="java.lang.String"/>
+	<field name="BRAND" class="java.lang.String"/>
+	<field name="VEHICLE_TYPE" class="java.lang.String"/>
+	<field name="COMPANY_POID" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="10" width="555" height="55" uuid="f74dd1a5-e18c-46c0-a31b-00dc28b4e37f"/>
+				<subreportParameter name="LOGIN_COMP_POID">
+					<subreportParameterExpression><![CDATA[$F{COMPANY_POID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUB_HEADER}]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="34">
+			<staticText>
+				<reportElement x="0" y="3" width="555" height="27" uuid="10bba5e9-e54f-4c04-94aa-b5396ecf3b9e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[FIXED ASSET]]></text>
+			</staticText>
+			<line>
+				<reportElement x="25" y="1" width="530" height="1" forecolor="#666666" uuid="3b21e9bc-af20-46b1-8997-430f40166084"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="25" y="30" width="530" height="1" forecolor="#666666" uuid="31e27fcd-d642-4e89-97e9-f8875bca52a3"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="168" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="10" width="100" height="20" uuid="a4e3cd5a-6fc3-4dea-bfe1-5372e45a3fc3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FA_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="29" width="292" height="20" uuid="f7aff312-6f40-4366-a88e-288a3c82a2d0"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FA_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="48" width="292" height="20" uuid="2bd3088e-36ef-4da7-bad1-0158e0b750b0"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ASSET_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="106" width="292" height="20" uuid="48606a4d-2adf-45a8-b740-e4f961a3f0f1"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FA_OWNER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement x="110" y="67" width="75" height="20" uuid="817f725e-1b82-43e2-9295-088633e3916b"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PURCHASE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="254" y="67" width="115" height="20" uuid="c1f92ed9-5fdb-4d27-bf80-52f2b3111702"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{INVOICE_NO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement x="110" y="87" width="100" height="20" uuid="87d9aeef-0484-4cbf-b77d-61f6fd4fa49a"/>
+				<textElement verticalAlignment="Middle">
+					<font isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="125" width="75" height="20" uuid="220d1eb0-14a2-4751-a201-a2ec1d61e5dc">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{REGISTRATION_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="293" y="125" width="154" height="20" uuid="e114f6cb-e38f-4fcb-8fc8-79f8578bc577">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ENGINE_CHASIS_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="110" y="145" width="75" height="20" uuid="30cd7214-8d4a-4739-b658-36ce67167098">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{BRAND}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="293" y="145" width="164" height="20" uuid="9242b80f-6024-4693-93ef-924a0ee6a08b">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{VEHICLE_TYPE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="25" y="10" width="74" height="20" uuid="ad54019a-4265-431b-a3e1-4936b8d7d7bb"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[FA Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="29" width="74" height="20" uuid="33be89ba-29ed-42ac-a6a7-d030561f6a8c"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[FA Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="48" width="74" height="20" uuid="e9242b07-7c11-40a7-b4b8-7f15ac5a94e6"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="67" width="74" height="20" uuid="8da6229b-8e1d-462f-a83a-9a4da91caacb"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Purchase Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="87" width="74" height="20" uuid="b7027dd8-9f68-4933-a93c-6a6660600206"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Gross Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="106" width="74" height="20" uuid="c602aad7-9abe-4521-b7ad-27c05108948f"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[FA Owner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="125" width="74" height="20" uuid="a6d0961b-4cc8-4caa-96ed-1cb532fe6608">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Reg No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="145" width="74" height="20" uuid="e341bad5-2730-4b00-a9f1-5897224d9479">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Brand]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="185" y="125" width="97" height="20" uuid="ed62e68b-5192-4afb-a750-33b98387e503">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Engine Chasis No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="185" y="145" width="97" height="20" uuid="3d50d238-62dd-4f3d-97e7-f4668757fb9f">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Vehicle Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="10" width="11" height="20" uuid="a1b63557-04f2-4985-bd4b-d61a0bb3a30f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="29" width="11" height="20" uuid="bd2df144-4c22-494c-9d79-6bb6eebca523"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="48" width="11" height="20" uuid="d4ada9ac-bdb9-4b43-bb21-44863bd45e45"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="67" width="11" height="20" uuid="50b26ce4-1ddc-41b9-89aa-759a65893757"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="87" width="11" height="20" uuid="a77ac52d-e4ae-4534-8974-0e323f450337"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="125" width="11" height="20" uuid="1b521abd-63c4-46b0-9670-dc0570c6de4f">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="106" width="11" height="20" uuid="8c1c7071-2dfd-4266-9022-29fbc91c0fb9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="99" y="145" width="11" height="20" uuid="3407e9d3-e338-493c-8230-3d880750daf0">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="185" y="67" width="58" height="20" uuid="125c3647-5c9b-4ab0-8833-234dfc5212e8"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Invoice No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="243" y="67" width="11" height="20" uuid="bff4c683-c689-4432-bc35-9633233e1782"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="125" width="11" height="20" uuid="26a797e9-5849-4432-be95-07ca2a2d1c05">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="145" width="11" height="20" uuid="3879b057-ba05-49f4-ac22-813c082ad2de">
+					<printWhenExpression><![CDATA[$F{ASSET_TYPE}=="MOTOR_VEHICLE"]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="108" splitType="Stretch">
+			<subreport>
+				<reportElement x="26" y="3" width="529" height="100" uuid="8867d674-3bdd-41a7-8136-dc1d64f09284"/>
+				<subreportParameter name="DOC_KEY_POID">
+					<subreportParameterExpression><![CDATA[$P{DOC_KEY_POID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGIN_COMP_POID">
+					<subreportParameterExpression><![CDATA[$F{COMPANY_POID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FA//FixedAssetSubreport1.jasper"]]></subreportExpression>
+			</subreport>
+			<line>
+				<reportElement x="26" y="1" width="530" height="1" forecolor="#666666" uuid="0723be8a-237a-421c-9f6f-e04929d0f413"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<subreport>
+				<reportElement x="25" y="0" width="530" height="24" uuid="024b6d98-c09d-486c-8f5c-ff574e519225"/>
+				<subreportParameter name="DOC_ID">
+					<subreportParameterExpression><![CDATA[$P{DOC_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOGIN_COMP_POID">
+					<subreportParameterExpression><![CDATA[$F{COMPANY_POID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUB_FOOTER}]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+</jasperReport>

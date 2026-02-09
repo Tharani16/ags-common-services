@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FixedAssetSubreport1" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="083e8722-d9b0-4afd-af6a-8b6b414b0348">
+	<property name="ireport.zoom" value="1.771561000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="style1" isBlankWhenNull="true" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#999999"/>
+			<leftPen lineWidth="1.0" lineColor="#999999"/>
+			<bottomPen lineWidth="1.0" lineColor="#999999"/>
+			<rightPen lineWidth="1.0" lineColor="#999999"/>
+		</box>
+	</style>
+	<parameter name="LOGIN_COMP_POID" class="java.lang.String">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DOC_KEY_POID" class="java.lang.String"/>
+	<parameter name="DEP_DATE" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["01-OCT-2020"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="plsql">
+		<![CDATA[{call PROC_FA_CURRENT_VALUE_DTL($P{LOGIN_COMP_POID}, $P{DEP_DATE}, $P{DOC_KEY_POID}, $P{ORACLE_REF_CURSOR} )}]]>
+	</queryString>
+	<field name="ACCUM_DEPRICIATION" class="java.math.BigDecimal"/>
+	<field name="WDV_VALUE" class="java.math.BigDecimal"/>
+	<field name="GROSS_BLOCK_START" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="20">
+			<staticText>
+				<reportElement x="-1" y="0" width="271" height="20" uuid="f83c9430-b2f4-47be-abfc-7f1b8986ff9b"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Depreciation Details]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement style="style1" x="100" y="0" width="172" height="20" uuid="7b5f5114-5f36-42ae-8710-8630c557ca85"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[Accumulated Depreciation Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="0" y="0" width="100" height="20" uuid="dfeb0afb-9db1-43b2-86d6-1f85e4973206"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[Gross Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="272" y="0" width="100" height="20" uuid="bccb89bb-65e6-408b-86db-f3d0cf167b99"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[Net Asset Value]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style1" x="100" y="0" width="172" height="20" uuid="46d5ca98-2e05-4b72-a0f8-518b40178a82"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isUnderline="false"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCUM_DEPRICIATION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style1" x="0" y="0" width="100" height="20" uuid="08ec22da-8eeb-4b10-8f7a-e52fa82edab0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS_BLOCK_START}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style1" x="272" y="0" width="100" height="20" uuid="657ee260-2a2e-491b-865e-1bfb602f0650"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WDV_VALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
