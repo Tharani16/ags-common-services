@@ -141,7 +141,7 @@ FROM(
 					<subreportParameterExpression><![CDATA[$P{COST_GROUP}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/GL/DivisionWiseComparisonSubreport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT1}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
