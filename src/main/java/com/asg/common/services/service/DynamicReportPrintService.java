@@ -63,7 +63,7 @@ public class DynamicReportPrintService {
     
     private void convertDateParams(Map<String, Object> params) {
         params.entrySet().forEach(entry -> {
-            if (entry.getKey().contains("DATE") && entry.getValue() instanceof String) {
+            if ((entry.getKey().contains("DATE") || entry.getKey().contains("PERIOD") || entry.getKey().contains("PERIOD2")) && entry.getValue() instanceof String) {
                 String value = (String) entry.getValue();
                 if (value.matches("\\d{4}-\\d{2}-\\d{2}")) {
                     entry.setValue(convertToOracleDate(value));
