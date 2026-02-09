@@ -68,4 +68,6 @@ public interface AttachmentService {
                                            Long createdBy);
     AttachmentDto getAttachmentBySeqNo(String docId, Long docKeyPoid, Long seqNo);
 
+    List<AttachmentDto> getAllAttachments(String docId, Long docKeyPoid);
+
 }

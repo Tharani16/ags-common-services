@@ -133,7 +133,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                     callEdiProc(groupPoid, companyPoid, docId, docKeyPoid, attachmentEDIJobPoid, loginUser);
                 }
 
-                uploaded.add(buildDto(docKeyPoid, originalName, storedName, remarks, checklistName, createdBy.toString(), new Date(), true));
+                uploaded.add(buildDto(docKeyPoid, originalName, storedName, remarks, checklistName,String.valueOf(createdBy != null ? createdBy : getUserPoid()), new Date(), true));
                 existingFileNames.add(originalName);
                 
                 // Log attachment upload
@@ -197,7 +197,19 @@ public class AttachmentServiceImpl implements AttachmentService {
     public List<AttachmentDto> getActiveAttachments(String docId, Long docKeyPoid) {
         validateDoc(docId, docKeyPoid);
 
-        return attachmentRepository.fetchActiveAttachments(getGroupPoid(), 1L, docId, docKeyPoid)
+        return attachmentRepository.fetchAllAttachments(getGroupPoid(), 1L, docId, docKeyPoid)
+                .stream()
+                .map(this::mapRowToDto)
+                .sorted(Comparator.comparing(AttachmentDto::getSeqNo, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AttachmentDto> getAllAttachments(String docId, Long docKeyPoid) {
+        validateDoc(docId, docKeyPoid);
+
+        return attachmentRepository.fetchAllAttachments(getGroupPoid(), UserContext.getCompanyPoid(), docId, docKeyPoid)
                 .stream()
                 .map(this::mapRowToDto)
                 .sorted(Comparator.comparing(AttachmentDto::getSeqNo, Comparator.nullsLast(Comparator.naturalOrder())))
@@ -250,7 +262,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         validateDoc(docId, docKeyPoid);
         
         // Check if any attachments exist for the given docId and docKeyPoid
-        List<AttachmentDto> existingAttachments = getActiveAttachments(docId, docKeyPoid);
+        List<AttachmentDto> existingAttachments = getAllAttachments(docId, docKeyPoid);
         if (existingAttachments.isEmpty()) {
             throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
         }
@@ -334,15 +346,54 @@ public class AttachmentServiceImpl implements AttachmentService {
                     throw new ResourceNotFoundException("Attachment", "seqNo", u.getSeqNo().toString());
                 }
             }
-            
+            // -------- FIX : Resolve filename by seqNo only --------
+            AttachmentDto existingAttachment = getAttachmentBySeqNo(
+                    actualDocId,
+                    u.getDocKeyPoid(),
+                    u.getSeqNo()
+            );
+            boolean remarksChanged =
+                    !Objects.equals(existingAttachment.getRemarks(), u.getRemarks());
+
+            boolean checklistChanged =
+                    !Objects.equals(existingAttachment.getChecklistName(), u.getChecklistName());
+
+            if (!remarksChanged && !checklistChanged) {
+                log.info("No changes detected for attachment seqNo={}, skipping update & log", u.getSeqNo());
+                continue;
+            }
+
+            String resolvedFileName =
+                    (u.getOriginalFileName() != null && !u.getOriginalFileName().isBlank())
+                            ? u.getOriginalFileName()
+                            : existingAttachment.getOriginalFileName();
+
             attachmentRepository.updateAttachment(
                     getGroupPoid(), 1L, actualDocId, u.getDocKeyPoid(), u.getSeqNo(),
-                    u.getOriginalFileName(), u.getRemarks(), u.getChecklistName(),
+                    existingAttachment.getOriginalFileName(),
+                    u.getRemarks(), u.getChecklistName(),
                     getUserPoid(), fileNameMapped
             );
-            
+
             // Log attachment update
-            loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_UPDATED, actualDocId, u.getDocKeyPoid().toString());
+            StringBuilder logMsg = new StringBuilder(
+                    "Attachment comments updated, File Name : " + resolvedFileName
+            );
+
+            if (remarksChanged) {
+                logMsg.append(", Remarks : ").append(u.getRemarks());
+            }
+            if (checklistChanged) {
+                logMsg.append(", Check List Name : ").append(u.getChecklistName());
+            }
+
+            loggingService.createLogSummaryEntry(
+                    actualDocId,
+                    u.getDocKeyPoid().toString(),
+                    logMsg.toString()
+            );
+
+
         }
         
         entityManager.flush();
@@ -403,7 +454,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
         
         // Log attachment download
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DOWNLOADED, docId, docKeyPoid.toString());
+        // loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DOWNLOADED, docId, docKeyPoid.toString());
 
         return new FileSystemResource(file);
     }
