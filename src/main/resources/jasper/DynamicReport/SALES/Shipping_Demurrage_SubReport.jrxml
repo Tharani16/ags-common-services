@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Shipping_Demurrage_SubReport" language="groovy" pageWidth="524" pageHeight="820" columnWidth="524" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a07fe0ef-932d-4384-ad4f-c652111ff74e">
+	<property name="ireport.zoom" value="2.3579476910000103"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="style1" mode="Transparent" isBlankWhenNull="true" fontSize="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{CHARGE_NAME}.toString().contains( '|' ) == true]]></conditionExpression>
+			<style mode="Transparent" forecolor="#000000" fill="Solid" isBlankWhenNull="true" fontSize="12" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+				<paragraph lineSpacing="1_1_2"/>
+			</style>
+		</conditionalStyle>
+	</style>
+	<queryString>
+		<![CDATA[SELECT
+CASE WHEN CHARGE_NAME LIKE '%|%' THEN 'CONTAINER TYPE: ' || CHARGE_NAME
+WHEN CHARGE_NAME LIKE '%-%FREE' THEN REPLACE(CHARGE_NAME, '- FREE','')
+ELSE CHARGE_NAME END CHARGE_NAME,
+CASE WHEN CHARGE_NAME LIKE '%FREE' THEN 'FREE'
+WHEN AMT_20_FT_BHD <> 0 AND TO_CHAR(AMT_20_FT_BHD) IS NOT NULL THEN TO_CHAR(AMT_20_FT_BHD)
+WHEN AMT_40_FT_BHD <> 0 AND TO_CHAR(AMT_40_FT_BHD) IS NOT NULL THEN TO_CHAR(AMT_40_FT_BHD)
+WHEN AMT_53_FT_BHD <> 0 AND TO_CHAR(AMT_53_FT_BHD) IS NOT NULL THEN TO_CHAR(AMT_53_FT_BHD)
+END AS AMOUNT
+FROM IMP_EXP_TARIFF_CHARGES_RPT
+WHERE VALUE_TYPE='DEMURRAGE'
+ORDER BY SEQ_NO]]>
+	</queryString>
+	<field name="CHARGE_NAME" class="java.lang.String"/>
+	<field name="AMOUNT" class="java.lang.String"/>
+	<title>
+		<band height="22">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="524" height="21" backcolor="#CCCCCC" uuid="54f83a2e-af6c-440b-8f3a-19269ad5e1f6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[DEMURRAGE TARIFF]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="style1" mode="Opaque" x="0" y="0" width="449" height="17" uuid="6883fb85-4f86-4619-a100-96ca8112f7ff"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHARGE_NAME}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="0" y="18" width="524" height="1" uuid="0b7992cb-c7e3-40c8-9658-207944b260ba"/>
+				<graphicElement>
+					<pen lineStyle="Dotted" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="449" y="0" width="68" height="17" uuid="83a8d295-aa3d-461f-96c7-a2b82df02339"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

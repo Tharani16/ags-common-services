@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BillwiseLedgerStatementFC" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e283d998-408e-4292-94c4-1f2bdb88a025">
 	<property name="ireport.zoom" value="2.1435888100000025"/>
 	<property name="ireport.x" value="128"/>
@@ -143,7 +143,7 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 				<staticText>
 					<reportElement x="351" y="139" width="82" height="18" uuid="963006ec-0444-4f51-b2a0-98bbca9dc9fb"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Total Amount]]></text>
 				</staticText>
@@ -157,7 +157,7 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 				<staticText>
 					<reportElement x="351" y="179" width="85" height="18" uuid="d6707978-fd7f-40f1-a244-c702e17f34f3"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[As on Date]]></text>
 				</staticText>
@@ -203,7 +203,7 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 				<staticText>
 					<reportElement x="412" y="119" width="63" height="18" uuid="f1b1e06f-9c9b-4aa4-bdec-84395d67c537"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Currency  -]]></text>
 				</staticText>
@@ -212,14 +212,14 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 						<printWhenExpression><![CDATA[$F{RESULT_STATUS}.equalsIgnoreCase("ERROR")]]></printWhenExpression>
 					</reportElement>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{RESULT}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
 					<reportElement x="475" y="119" width="30" height="18" uuid="30126c39-6270-44df-a077-c48985e51823"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{CURRENCY_CODE}]]></textFieldExpression>
 				</textField>
@@ -228,14 +228,14 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 				<staticText>
 					<reportElement x="31" y="0" width="62" height="18" uuid="ee14a4fd-6a70-45d6-8299-9211a0a9db96"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Date]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="455" y="0" width="65" height="18" uuid="21f9a20e-bd6c-4439-88e5-f992e3b5f218"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Due Date]]></text>
 				</staticText>
@@ -248,7 +248,7 @@ WHERE COMPANY_POID =   $P{Company_poid}]]>
 				<staticText>
 					<reportElement x="520" y="0" width="35" height="18" uuid="60879b48-9969-45ff-b1f7-540df576fba0"/>
 					<textElement textAlignment="Center">
-						<font size="6" isBold="true"/>
+						<font size="6" isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Over
 Due Days]]></text>
@@ -256,14 +256,14 @@ Due Days]]></text>
 				<staticText>
 					<reportElement x="285" y="0" width="63" height="18" uuid="8b9b27d2-a419-4bde-951a-dd0776b1dba8"/>
 					<textElement textAlignment="Right">
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Total Amt]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="370" y="0" width="64" height="18" uuid="8147ed78-cca8-4050-b97b-06813b3ee16d"/>
 					<textElement textAlignment="Right">
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Pending Amt]]></text>
 				</staticText>
@@ -276,14 +276,14 @@ Due Days]]></text>
 				<staticText>
 					<reportElement x="173" y="0" width="112" height="18" uuid="08c1dd9c-97d2-445e-aa30-7253b72a6d78"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Narration]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="93" y="0" width="80" height="18" uuid="3fa4845d-5eea-4201-a16c-5c0507f33bc7"/>
 					<textElement>
-						<font isBold="true"/>
+						<font isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Ref]]></text>
 				</staticText>
@@ -301,7 +301,7 @@ Due Days]]></text>
 				<staticText>
 					<reportElement x="219" y="0" width="33" height="18" uuid="a8c84c43-fa64-4329-893b-0a4fdad16319"/>
 					<textElement>
-						<font size="9" isBold="true"/>
+						<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
 					</textElement>
 					<text><![CDATA[Total :]]></text>
 				</staticText>
@@ -350,21 +350,21 @@ Due Days]]></text>
 			<staticText>
 				<reportElement x="285" y="0" width="65" height="18" uuid="88191561-f204-4060-bcc1-45196d8a671c"/>
 				<textElement textAlignment="Right">
-					<font isBold="true"/>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Total Amt]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="89" y="0" width="80" height="18" uuid="5f77c1b4-7625-4d62-a1dd-a44d90b7d4bd"/>
 				<textElement>
-					<font isBold="true"/>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Ref]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="516" y="0" width="35" height="18" uuid="c7a2a44d-b907-4ce0-9b5f-176de9be5cb6"/>
 				<textElement textAlignment="Center">
-					<font size="6" isBold="true"/>
+					<font size="6" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Over
 Due Days]]></text>
@@ -372,7 +372,7 @@ Due Days]]></text>
 			<staticText>
 				<reportElement x="169" y="0" width="112" height="18" uuid="2f2fac18-6751-4d5f-b5b9-ed278ed7be87"/>
 				<textElement>
-					<font isBold="true"/>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Narration]]></text>
 			</staticText>
@@ -385,21 +385,21 @@ Due Days]]></text>
 			<staticText>
 				<reportElement x="370" y="0" width="64" height="18" uuid="5011a1fe-868b-4287-8e56-4e604da26af0"/>
 				<textElement textAlignment="Right">
-					<font isBold="true"/>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Pending Amt]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="451" y="0" width="65" height="18" uuid="8cbf3c27-fa9d-49f8-8817-e3933e0f1e5d"/>
 				<textElement>
-					<font isBold="true"/>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Due Date]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="27" y="0" width="62" height="18" uuid="a2193531-1e1d-434c-8c4c-0ec272895efd"/>
 				<textElement>
-					<font isBold="true"/>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Date]]></text>
 			</staticText>
