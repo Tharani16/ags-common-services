@@ -30,7 +30,7 @@ public class DynamicPrintController {
         String downloadFileName = (rptName != null && !rptName.isEmpty()) ? rptName + ".pdf" : "report.pdf";
         log.info("PDF generated successfully for report: {}", downloadFileName);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadFileName + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + downloadFileName + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfBytes);
     }
