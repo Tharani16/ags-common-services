@@ -43,7 +43,7 @@
 					<subreportParameterExpression><![CDATA[$P{P_RPT_SELECTED_VALUES_LIST}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FA//AssetTagReportSubreport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT1}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

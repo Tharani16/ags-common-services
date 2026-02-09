@@ -158,7 +158,7 @@ FROM(
 					<subreportParameterExpression><![CDATA[$F{COMPARISON_YEAR_COLUMN}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "//RevenueReports//DivisionWiseComparisonPeriodSubreport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT1}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

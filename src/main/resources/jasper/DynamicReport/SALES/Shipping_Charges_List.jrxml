@@ -122,7 +122,7 @@ where LINE_POID=$P{LINE}]]>
 			<subreport>
 				<reportElement positionType="Float" x="0" y="0" width="524" height="24" uuid="6dd42501-c640-44a0-8cd9-a01026a1d3b1"/>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "//SALES//Shipping_Charges_Subreport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT1}]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="25">
@@ -130,28 +130,28 @@ where LINE_POID=$P{LINE}]]>
 			<subreport>
 				<reportElement positionType="Float" x="0" y="0" width="524" height="24" uuid="254eb85a-9b44-4ab2-8d64-da9f8c8f04d6"/>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "//SALES//Shipping_Demurrage_SubReport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT2}]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="25">
 			<subreport>
 				<reportElement x="0" y="0" width="524" height="24" uuid="52160d3a-a94a-4b68-8a8d-dee9a89c4494"/>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "//SALES//Shipping_Charges_Export_Subreport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT3}]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="25">
 			<subreport>
 				<reportElement positionType="Float" x="0" y="0" width="524" height="24" uuid="4f78225f-8e07-4847-a91b-89670b050259"/>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "//SALES//Shipping_Detention_SubReport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT4}]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="10">
 			<subreport>
 				<reportElement positionType="Float" x="0" y="0" width="524" height="8" uuid="f60816ea-e97a-47cb-8115-21e5380e96bf"/>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "//SALES//Shipping_Charges_Final_Dummy.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT5}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

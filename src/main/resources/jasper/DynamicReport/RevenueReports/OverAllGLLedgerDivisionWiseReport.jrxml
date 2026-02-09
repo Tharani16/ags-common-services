@@ -179,7 +179,7 @@ FROM(
 					<subreportParameterExpression><![CDATA[$P{CHARGE_WISE}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/RevenueReports/OverAllGLLedgerDivisionWiseSubreport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT1}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

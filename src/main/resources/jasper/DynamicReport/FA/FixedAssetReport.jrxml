@@ -324,7 +324,7 @@ WHERE FA_POID=$P{DOC_KEY_POID}]]>
 					<subreportParameterExpression><![CDATA[$F{COMPANY_POID}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FA//FixedAssetSubreport1.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT1}]]></subreportExpression>
 			</subreport>
 			<line>
 				<reportElement x="26" y="1" width="530" height="1" forecolor="#666666" uuid="0723be8a-237a-421c-9f6f-e04929d0f413"/>

@@ -135,7 +135,7 @@ WHERE GCM.COMPANY_POID LIKE DECODE($P{COMPANY_POID},999,'%',$P{COMPANY_POID})
 					<subreportParameterExpression><![CDATA[$P{PERIOD_DATE}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "GL/TradeDebtorsSummarySubReport1.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT1}]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
