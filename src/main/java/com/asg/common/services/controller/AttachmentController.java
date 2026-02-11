@@ -143,19 +143,11 @@ public class AttachmentController {
                 return success(message, uploadResponse);
 
 
-                // CASE 2 → Upload only (but include remarks for new file)
+                // CASE 2 → Upload only
             }  else if (uploadResponse != null) {
-
-                String message;
-                if (remarksPresentInUploads) {
-                    message = uploadResponse.isHasErrors() ?
-                            "Files uploaded with some errors and remarks updated" :
-                            "File uploaded successfully and Remarks are updated";
-                } else {
-                    message = uploadResponse.isHasErrors() ?
-                            "Files uploaded with some errors" :
-                            "Files uploaded successfully";
-                }
+                String message = uploadResponse.isHasErrors() ?
+                        "Files uploaded with some errors" :
+                        "File uploaded successfully";
                 return success(message, uploadResponse);
 
                 // CASE 3 → Only update (no upload)
