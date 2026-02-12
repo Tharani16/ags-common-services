@@ -143,9 +143,22 @@ public class AttachmentController {
 
                 // CASE 2 → Upload only
             }  else if (uploadResponse != null) {
-                String message = uploadResponse.isHasErrors() ?
-                        "Files uploaded with some errors" :
-                        "File uploaded successfully";
+                String message;
+                if (uploadResponse.isHasErrors()) {
+                    List<String> duplicateFiles = uploadResponse.getErrors().stream()
+                            .filter(err -> err.contains("already exists"))
+                            .map(err -> err.replace("File already exists: ", ""))
+                            .collect(Collectors.toList());
+                    
+                    if (!duplicateFiles.isEmpty()) {
+                        message = duplicateFiles.size() + " duplicate file(s) found and skipped...Files :[" + 
+                                String.join(", ", duplicateFiles) + "]";
+                    } else {
+                        message = "Files uploaded with some errors";
+                    }
+                } else {
+                    message = "File uploaded successfully";
+                }
                 return success(message, uploadResponse);
 
                 // CASE 3 → Only update (no upload)
