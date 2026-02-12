@@ -110,7 +110,7 @@ public class DynamicReportPrintService {
             }
             case "400-219" -> {
                 params.put("SUBREPORT1", printService.load("DynamicReport/GL/LedgerGroupSummarySubReport1.jrxml"));
-                yield printService.load("DynamicReport/Gl/LedgerGroupSummary.jrxml");
+                yield printService.load("DynamicReport/GL/LedgerGroupSummary.jrxml");
             }
             case "400-240" -> printService.load("DynamicReport/GL/LedgerStatementFC.jrxml");
             case "400-331" -> {
