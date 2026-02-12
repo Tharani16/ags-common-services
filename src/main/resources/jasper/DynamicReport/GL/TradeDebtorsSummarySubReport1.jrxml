@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TradeDebtorsSummarySubReport1" language="groovy" pageWidth="802" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="02cd35d8-f1d1-4451-99aa-679f8c91a1f2">
+	<property name="ireport.zoom" value="2.3579476910000023"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="style1" isBlankWhenNull="true" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#999999"/>
+			<leftPen lineWidth="1.0" lineColor="#999999"/>
+			<bottomPen lineWidth="1.0" lineColor="#999999"/>
+			<rightPen lineWidth="1.0" lineColor="#999999"/>
+		</box>
+	</style>
+	<style name="style2" isBlankWhenNull="true" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box>
+			<topPen lineWidth="0.75" lineColor="#999999"/>
+			<leftPen lineWidth="0.75" lineColor="#999999"/>
+			<bottomPen lineWidth="0.75" lineColor="#999999"/>
+			<rightPen lineWidth="0.75" lineColor="#999999"/>
+		</box>
+	</style>
+	<parameter name="PERIOD_DATE" class="java.lang.String"/>
+	<parameter name="PERIOD_DATE2" class="java.lang.String"/>
+	<parameter name="COMPANY_POID" class="java.lang.String"/>
+	<parameter name="ZERO_BALANCE" class="java.lang.String"/>
+	<queryString language="plsql">
+		<![CDATA[{call PROC_GL_TRADE_CUST_SUMMARY_RPT($P{PERIOD_DATE}, $P{PERIOD_DATE2}, $P{COMPANY_POID}, $P{ZERO_BALANCE}, $P{ORACLE_REF_CURSOR} )}]]>
+	</queryString>
+	<field name="CUSTOMER_CODE" class="java.lang.String"/>
+	<field name="CUSTOMER_NAME" class="java.lang.String"/>
+	<field name="OPENING_BALANCE_DR" class="java.math.BigDecimal"/>
+	<field name="OPENING_BALANCE_CR" class="java.math.BigDecimal"/>
+	<field name="SALES_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="RECEIPT_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="CLOSING_BALANCE_DR" class="java.math.BigDecimal"/>
+	<field name="CLOSING_BALANCE_CR" class="java.math.BigDecimal"/>
+	<field name="CLOSING_BALANCE" class="java.math.BigDecimal"/>
+	<field name="CLOSING_BALANCE_FORMAT" class="java.lang.String"/>
+	<variable name="OPENING_BALANCE_DR_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{OPENING_BALANCE_DR}]]></variableExpression>
+	</variable>
+	<variable name="OPENING_BALANCE_CR_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{OPENING_BALANCE_CR}]]></variableExpression>
+	</variable>
+	<variable name="SALES_AMOUNT_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{SALES_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="RECEIPT_AMOUNT_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{RECEIPT_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="CLOSING_BALANCE_DR_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CLOSING_BALANCE_DR}]]></variableExpression>
+	</variable>
+	<variable name="CLOSING_BALANCE_CR_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CLOSING_BALANCE_CR}]]></variableExpression>
+	</variable>
+	<variable name="CLOSING_BALANCE_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CLOSING_BALANCE}]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement style="style1" x="73" y="0" width="159" height="20" uuid="1bea2c9a-5bae-44c8-ac7d-4d267dbc5166"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[Customer Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="232" y="0" width="82" height="20" uuid="22117462-5e06-453e-8f05-6c8a8d1baf97"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="1"/>
+				</textElement>
+				<text><![CDATA[Opening Bal DR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="394" y="0" width="80" height="20" uuid="fa78aa46-271f-46ed-ab70-84ef96a88b94"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="1"/>
+				</textElement>
+				<text><![CDATA[Sales Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="474" y="0" width="83" height="20" uuid="337bb31c-b58e-4f75-b8ca-7788b667fd05"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="1"/>
+				</textElement>
+				<text><![CDATA[Receipt Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="557" y="0" width="80" height="20" uuid="9f230402-4c50-45be-870d-7248fbd6d7f9"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="1"/>
+				</textElement>
+				<text><![CDATA[Closing Bal DR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="637" y="0" width="80" height="20" uuid="bdfef98f-bec9-446f-bda3-9c2dbf18c5d4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="1"/>
+				</textElement>
+				<text><![CDATA[Closing Bal CR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="314" y="0" width="80" height="20" uuid="123a8986-d50e-4a62-a2a7-0b8ef321fe91"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="1"/>
+				</textElement>
+				<text><![CDATA[Opening Bal CR]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="20" width="802" height="1" uuid="cf92ad89-4d1f-43f2-af05-d511c3d53624"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="802" height="1" uuid="09a87052-26d7-40ea-8070-c0ecd7df0a00"/>
+			</line>
+			<staticText>
+				<reportElement style="style1" x="0" y="1" width="32" height="20" uuid="090a37c3-7fff-4b8c-9a57-4fac6fed32e7"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[SL No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="32" y="1" width="41" height="20" uuid="7374cfd1-102d-47fb-b643-683dee3fd085"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="style1" x="717" y="1" width="85" height="20" uuid="fab710ae-adca-4b28-86c4-c96f3d00cc4d"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Closing Balance]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="style2" x="73" y="0" width="159" height="15" uuid="cb835f91-c906-4b2e-8dd4-5c61d8c1c157"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUSTOMER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="232" y="0" width="82" height="15" uuid="2769eaa0-70e3-4c9b-9b1d-3f18396c0fb8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPENING_BALANCE_DR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="394" y="0" width="80" height="15" uuid="0bb73c02-e050-437d-bddd-a24713ace3be"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALES_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="474" y="0" width="83" height="15" uuid="5b418c62-ff80-4523-a80b-218574ce065a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RECEIPT_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="557" y="0" width="80" height="15" uuid="8b089a63-2bf0-4004-9384-8f60b10a7def"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLOSING_BALANCE_DR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="637" y="0" width="80" height="15" uuid="5e8f94f8-61cd-4e89-ae2a-51a96acdac69"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLOSING_BALANCE_CR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000" isBlankWhenNull="true">
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="314" y="0" width="80" height="15" uuid="27eccf8f-992a-41df-bba6-d8efdf01705e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPENING_BALANCE_CR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="32" height="15" uuid="949a342b-f950-43ff-ba37-3b704059fa79"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="32" y="0" width="41" height="15" uuid="e3b600e3-b445-4a3d-b244-2c7bc926fa75"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUSTOMER_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000">
+				<reportElement style="style2" positionType="Float" stretchType="RelativeToBandHeight" x="717" y="0" width="84" height="15" uuid="44a5609e-2623-4ed4-bff1-abb0e28f60da"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CLOSING_BALANCE_FORMAT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="20">
+			<staticText>
+				<reportElement style="style1" x="0" y="0" width="232" height="20" uuid="e9554d5f-48c6-4788-9281-4ce7842f5501"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<textField pattern="#,##0.000">
+				<reportElement style="style1" x="232" y="0" width="82" height="20" uuid="1f37eca3-e316-4e0b-8e2c-a6cbc82bc2ef"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{OPENING_BALANCE_DR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000">
+				<reportElement style="style1" x="314" y="0" width="80" height="20" uuid="f2e64206-da30-4b0f-bb31-61ccbe013e18"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{OPENING_BALANCE_CR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000">
+				<reportElement style="style1" x="474" y="0" width="83" height="20" uuid="4efdb164-d604-4277-8b34-5bc727a8db1d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{RECEIPT_AMOUNT_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000">
+				<reportElement style="style1" x="394" y="0" width="80" height="20" uuid="f445d529-5ea0-4e05-a9a3-2547ca3f07fd"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SALES_AMOUNT_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000">
+				<reportElement style="style1" x="557" y="0" width="80" height="20" uuid="42241aae-6d66-4e9c-a93b-4b179a8c6c07"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CLOSING_BALANCE_DR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000">
+				<reportElement style="style1" x="637" y="0" width="80" height="20" uuid="12f0a569-286f-43ad-b2d5-e47e3655a3d1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CLOSING_BALANCE_CR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.000;(#,##0.000)">
+				<reportElement style="style1" x="717" y="0" width="84" height="20" uuid="7ac1f6a8-fd24-41d9-a33b-9d4d919214c7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+					<paragraph rightIndent="1"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CLOSING_BALANCE_TOTAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

@@ -26,6 +26,11 @@ public class DynamicPrintController {
             @RequestParam String rptDocId,
             @RequestParam String rptName,
             @RequestBody(required = false) Map<String, Object> rptParams) throws Exception {
+        // Pass report name to service for PDF metadata
+        if (rptParams == null) {
+            rptParams = new java.util.HashMap<>();
+        }
+        rptParams.put("REPORT_TITLE", rptName);
         byte[] pdfBytes = dynamicReportPrintService.generateReportPdf(rptDocId, rptParams);
         String downloadFileName = (rptName != null && !rptName.isEmpty()) ? rptName + ".pdf" : "report.pdf";
         log.info("PDF generated successfully for report: {}", downloadFileName);

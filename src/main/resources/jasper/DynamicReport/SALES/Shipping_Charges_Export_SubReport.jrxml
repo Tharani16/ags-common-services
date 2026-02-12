@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Shipping_Charges_Export_SubReport" language="groovy" pageWidth="524" pageHeight="820" columnWidth="524" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a07fe0ef-932d-4384-ad4f-c652111ff74e">
+	<property name="ireport.zoom" value="2.5937424601000116"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT ROWNUM SEQ_NO, CHARGE_NAME, 'BHD' CURRENCY, AMT_20_FT_BHD, AMT_40_FT_BHD,AMT_PER_BL_BHD
+FROM IMP_EXP_TARIFF_CHARGES_RPT
+WHERE CHARGE_TYPE='EXPORT'
+AND CHARGE_CODE IS NOT NULL]]>
+	</queryString>
+	<field name="SEQ_NO" class="java.math.BigDecimal"/>
+	<field name="CHARGE_NAME" class="java.lang.String"/>
+	<field name="CURRENCY" class="java.lang.String"/>
+	<field name="AMT_20_FT_BHD" class="java.math.BigDecimal"/>
+	<field name="AMT_40_FT_BHD" class="java.math.BigDecimal"/>
+	<field name="AMT_PER_BL_BHD" class="java.math.BigDecimal"/>
+	<pageHeader>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="18" width="30" height="18" uuid="196889db-d081-46fb-a9c6-11419be5d238"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="Float" x="0" y="17" width="524" height="1" uuid="e39decbc-34fb-41e8-9da5-8a252b402275"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Double" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="310" y="18" width="52" height="18" uuid="2fb8973d-1e75-4dab-a117-8219a1ab9230"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+				</textElement>
+				<text><![CDATA[Currency]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="18" width="280" height="18" uuid="6694a12a-9f5c-4bdc-9ab0-8585dd036d86"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+				</textElement>
+				<text><![CDATA[Charges]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="Float" x="0" y="37" width="524" height="1" uuid="0af3290b-3fac-406b-b5e2-790c8a262b36"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Double" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="362" y="18" width="52" height="18" uuid="8263be4e-adec-4273-a226-fd941e7d1f45"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+				</textElement>
+				<text><![CDATA[20_Ft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="414" y="18" width="52" height="18" uuid="4b77d744-da66-40f0-b121-c761ba15a8c4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+				</textElement>
+				<text><![CDATA[40_Ft]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="524" height="18" forecolor="#FFFFFF" backcolor="#000066" uuid="85badb9e-77b9-4cf8-8736-557ebedf2bdf"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[EXPORT TARIFF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="466" y="18" width="52" height="18" uuid="bbf372f7-bc25-4fc1-a513-0a04e7b211b2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+				</textElement>
+				<text><![CDATA[Per B/L]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="19" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="30" y="0" width="280" height="17" uuid="6883fb85-4f86-4619-a100-96ca8112f7ff"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHARGE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="310" y="0" width="52" height="17" uuid="07e4e113-58f4-4a0b-980c-0c4669a1de35"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CURRENCY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="362" y="0" width="52" height="17" uuid="9217680d-6911-42c3-9699-ae5659d28983"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMT_20_FT_BHD}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="30" height="17" uuid="e00eb427-6d9d-404e-ad34-79a23447c8e4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SEQ_NO}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="0" y="17" width="524" height="1" uuid="0b7992cb-c7e3-40c8-9658-207944b260ba"/>
+				<graphicElement>
+					<pen lineStyle="Dotted" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="414" y="0" width="52" height="17" uuid="7d650c35-6705-4d94-9e96-4acedd29cd08"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMT_40_FT_BHD}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="466" y="0" width="52" height="17" uuid="635afa46-c98a-4dd3-acc1-d2410833d439"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+					<paragraph rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AMT_PER_BL_BHD}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
