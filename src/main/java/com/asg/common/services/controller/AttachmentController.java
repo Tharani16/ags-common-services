@@ -66,13 +66,13 @@ public class AttachmentController {
             if (structuredRequests != null && !structuredRequests.isEmpty()) {
                 for (AttachmentUploadDto dto : structuredRequests) {
 
-                    // NEW file (seqNo null)
-                    if (dto.getSeqNo() == null) {
+                    // NEW file (seqNo null) OR file replacement (seqNo present + file present)
+                    if (dto.getSeqNo() == null || dto.getFile() != null) {
                         structuredUploads.add(dto);
                         continue;
                     }
 
-                    // EXISTING file (update case)
+                    // EXISTING file metadata update only (no file upload)
                     AttachmentDto old = attachmentService.getAttachmentBySeqNo(docId, docKeyPoid, dto.getSeqNo());
 
                     boolean remarksChanged =
@@ -83,10 +83,8 @@ public class AttachmentController {
                             dto.getChecklistName() != null &&
                                     !dto.getChecklistName().equals(old.getChecklistName());
 
-                    boolean fileChanged = dto.getFile() != null; // Important fix
-
                     // If nothing changed → skip
-                    if (!remarksChanged && !checklistChanged && !fileChanged) {
+                    if (!remarksChanged && !checklistChanged) {
                         continue;
                     }
 
@@ -205,13 +203,13 @@ public class AttachmentController {
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<AttachmentDto> result;
-            
+
             if (filterType != null) {
                 result = attachmentService.getAttachmentsByFilter(docId, docKeyPoid, filterType, pageable);
             } else {
                 result = attachmentService.getAttachments(docId, docKeyPoid, includeArchived, pageable);
             }
-            
+
             return success("Attachments fetched successfully", PaginationUtil.wrapPage(result,null));
         } catch (Exception ex) {
             return internalServerError("Fetch failed: " + ex.getMessage());
