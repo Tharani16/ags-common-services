@@ -21,7 +21,7 @@ public class GlPostingServiceImpl implements GlPostingService {
     }
 
     @Override
-    public String glreposting(int loginGroupPoid, int loginCompanyPoid, int loginUserPoid, String docId, int transactionPoid, int docRef) {
+    public String glreposting(int loginGroupPoid, int loginCompanyPoid, int loginUserPoid, String docId, int transactionPoid, String docRef) {
         return repository.glreposting(loginGroupPoid, loginCompanyPoid, loginUserPoid, docId, transactionPoid, docRef);
     }
 }

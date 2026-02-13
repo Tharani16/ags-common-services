@@ -166,7 +166,7 @@ public class GlPostingRepository {
         return date != null ? date.toLocalDate() : null;
     }
 
-    public String glreposting(int loginGroupPoid, int loginCompanyPoid, int loginUserPoid, String docId, int transactionPoid, int docRef) {
+    public String glreposting(int loginGroupPoid, int loginCompanyPoid, int loginUserPoid, String docId, int transactionPoid, String docRef) {
         String outPutMessage = StringUtils.EMPTY;
         try (Connection connection = dataSource.getConnection();
              CallableStatement cs = connection.prepareCall(
@@ -177,7 +177,7 @@ public class GlPostingRepository {
             cs.setInt(3, loginUserPoid);
             cs.setString(4, docId);
             cs.setInt(5, transactionPoid);
-            cs.setInt(6, docRef);
+            cs.setString(6, docRef);
             cs.registerOutParameter(7, Types.VARCHAR);
             cs.setString(8, "N");
 
