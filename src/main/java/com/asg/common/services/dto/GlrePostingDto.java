@@ -11,5 +11,5 @@ public class GlrePostingDto {
     private int loginUserPoid;
     private String docId;
     private int transactionPoid;
-    private int docRef;
+    private String docRef;
 }

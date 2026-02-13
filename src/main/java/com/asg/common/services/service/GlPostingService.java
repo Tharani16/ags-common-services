@@ -6,5 +6,5 @@ import java.sql.SQLException;
 
 public interface GlPostingService {
     GlPostingViewResponseDto fetchGlPostings(String docId, Long transactionPoid) throws SQLException;
-    String glreposting (int loginGroupPoid, int loginCompanyPoid, int loginUserPoid, String docId, int transactionPoid, int docRef);
+    String glreposting (int loginGroupPoid, int loginCompanyPoid, int loginUserPoid, String docId, int transactionPoid, String docRef);
 }
