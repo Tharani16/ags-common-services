@@ -148,6 +148,7 @@ public class AttachmentController {
                     List<String> duplicateFiles = uploadResponse.getErrors().stream()
                             .filter(err -> err.contains("already exists"))
                             .map(err -> err.replace("File already exists: ", ""))
+                            .distinct()  // Remove duplicate filenames
                             .collect(Collectors.toList());
                     
                     if (!duplicateFiles.isEmpty()) {

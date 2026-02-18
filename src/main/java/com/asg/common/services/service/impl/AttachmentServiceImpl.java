@@ -137,7 +137,8 @@ public class AttachmentServiceImpl implements AttachmentService {
                 existingFileNames.add(originalName);
                 
                 // Log attachment upload
-                loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_UPLOADED, docId, docKeyPoid.toString());
+                String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENTS_UPLOADED.getDescription(), originalName);
+                loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
 
             } catch (Exception ex) {
                 log.error("Upload failed for {}: {}", file.getOriginalFilename(), ex.getMessage(), ex);
@@ -250,10 +251,14 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new ResourceNotFoundException("Attachment", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid + ", fileNameMapped=" + fileNameMapped);
         }
 
+        // Get filename before deletion
+        String originalFileName = attachment.get().getFileName();
+        
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, fileNameMapped);
         
         // Log attachment deletion
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DELETED, docId, docKeyPoid.toString());
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_DELETED.getDescription(), originalFileName);
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
     }
 
     @Override
@@ -267,7 +272,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
         }
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, "(ALL)");
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_DELETED, docId, docKeyPoid.toString());
+        String logDetail = String.format("%s All attachments deleted", LogDetailsEnum.ATTACHMENTS_DELETED.getDescription());
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
     }
 
     @Override
@@ -283,7 +289,8 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachmentRepository.archiveAttachment(getGroupPoid(), 1L, docId, docKeyPoid, fileNameMapped);
         
         // Log attachment archiving
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_ARCHIVED, docId, docKeyPoid.toString());
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_ARCHIVED.getDescription(), originalFileName);
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
         
         // Generate archived filename with timestamp (format: ddMMyyyyHHmm_originalname)
         String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyyHHmm"));
@@ -465,9 +472,10 @@ public class AttachmentServiceImpl implements AttachmentService {
         Attachment a = attachmentRepository
                 .findByDocIdAndDocKeyPoidAndFileNameMappedForArchive(docId, docKeyPoid, fileNameMapped)
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment", "fileNameMapped", fileNameMapped));
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_VIEWED.getDescription(), a.getFileName());
 
         // Log attachment viewed
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_VIEWED, docId, docKeyPoid.toString());
+        loggingService.createLogSummaryEntry( docId, docKeyPoid.toString(), logDetail);
 
         return mapRowToDto(new Object[]{
                 a.getGroupPoid(), a.getCompanyPoid(), a.getDocId(),
