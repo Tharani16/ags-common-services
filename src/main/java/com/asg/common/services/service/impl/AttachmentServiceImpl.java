@@ -272,7 +272,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
         }
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, "(ALL)");
-        String logDetail = String.format("%s All attachments deleted", LogDetailsEnum.ATTACHMENTS_DELETED.getDescription());
+        String logDetail = LogDetailsEnum.ATTACHMENTS_DELETED.getDescription();
         loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
     }
 
