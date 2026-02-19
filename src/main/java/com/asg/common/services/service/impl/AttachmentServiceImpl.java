@@ -430,38 +430,28 @@ public class AttachmentServiceImpl implements AttachmentService {
     public Resource downloadAttachment(String docId, Long docKeyPoid, String fileNameMapped) {
         validateDoc(docId, docKeyPoid);
 
-        // Get attachment from database
         Attachment attachment = attachmentRepository
                 .findByDocIdAndDocKeyPoidAndFileNameMappedForArchive(docId, docKeyPoid, fileNameMapped)
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment", "fileNameMapped", fileNameMapped));
 
-        // Resolve attachments path based on document type
         String attachmentsPath = resolveAttachmentsPath(docId);
         if (attachmentsPath == null || attachmentsPath.trim().isEmpty()) {
             throw new AsgException("AttachmentsPath is missing for login company", 500);
         }
 
-        // Check if fileNameMapped already has extension
         String mappedFileName = attachment.getFileNameMapped();
         File file;
         
         if (mappedFileName.contains(".")) {
-            // Already has extension, use as-is
             file = new File(attachmentsPath, mappedFileName);
         } else {
-            // No extension, add it from original filename (like upload method does)
             String extension = FilenameUtils.getExtension(attachment.getFileName());
             file = new File(attachmentsPath, mappedFileName + "." + extension);
         }
         
-
-        
         if (!file.exists() || !file.canRead()) {
             throw new ResourceNotFoundException("File not found on server", "path", file.getAbsolutePath());
         }
-        
-        // Log attachment download
-        // loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DOWNLOADED, docId, docKeyPoid.toString());
 
         return new FileSystemResource(file);
     }
@@ -474,7 +464,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment", "fileNameMapped", fileNameMapped));
         String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_VIEWED.getDescription(), a.getFileName());
 
-        // Log attachment viewed
+        // Log attachment viewed/downloaded
         loggingService.createLogSummaryEntry( docId, docKeyPoid.toString(), logDetail);
 
         return mapRowToDto(new Object[]{
