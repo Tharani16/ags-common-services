@@ -176,7 +176,7 @@ public class DocumentLockController {
 
         String normalized = status.trim();
         if (normalized.startsWith("Locked By")) {
-            return conflict("Document is already locked by another user");
+            return conflict("Document is already locked by another user. " + normalized);
         }
         if (normalized.toUpperCase().startsWith("ERROR")) {
             return conflict(normalized);
