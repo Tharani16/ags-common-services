@@ -21,6 +21,7 @@
 	</parameter>
 	<parameter name="SUBREPORT1" class="net.sf.jasperreports.engine.JasperReport"/>
 	<parameter name="OTHER_INCOME" class="java.lang.String"/>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT DISTINCT COMPANY_NAME,
 CASE WHEN $P{OTHER_INCOME}='Y' AND $P{PROFIT_TYPE}='GROSS_PROFIT' THEN 'Included'
@@ -152,7 +153,7 @@ FROM(
 				<textElement verticalAlignment="Middle">
 					<font size="9" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
