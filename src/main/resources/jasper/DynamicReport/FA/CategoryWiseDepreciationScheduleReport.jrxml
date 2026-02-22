@@ -251,6 +251,7 @@
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["\\\\shippingbahrain.com\\data\\ERP_REPORTS\\Reports\\"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT DISTINCT COMPANY_NAME
 FROM(
@@ -984,7 +985,7 @@ WHERE GCM.COMPANY_POID LIKE DECODE($P{COMPANY},999,'%',$P{COMPANY})
 			</textField>
 			<textField pattern="EEE, d MMM yyyy HH:mm" isBlankWhenNull="true">
 				<reportElement x="0" y="7" width="386" height="20" forecolor="#999999" uuid="cf5ec9b8-d347-4bf5-b97e-b877a09f000c"/>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
