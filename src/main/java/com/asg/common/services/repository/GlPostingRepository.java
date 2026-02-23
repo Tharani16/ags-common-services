@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,7 +96,7 @@ public class GlPostingRepository {
             dto.setDrAmt(rs.getBigDecimal("DR_AMT"));
             dto.setCrAmt(rs.getBigDecimal("CR_AMT"));
             dto.setPostedBy(rs.getString("POSTED_BY"));
-            dto.setPostedDate(convertToLocalDate(rs.getDate("POSTED_DATE")));
+            dto.setPostedDate(LocalDate.from(convertToLocalDate(rs.getDate("POSTED_DATE")).atStartOfDay()).atStartOfDay());
             entries.add(dto);
         }
 
