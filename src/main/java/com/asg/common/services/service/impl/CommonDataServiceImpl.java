@@ -10,6 +10,7 @@ import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
 import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
 import com.asg.common.lib.dto.response.StockDetailsResponse;
 import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
+import com.asg.common.lib.exception.ValidationException;
 import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.lib.service.LovDataService;
 import com.asg.common.services.client.TaxServiceClient;
@@ -88,17 +89,22 @@ public class CommonDataServiceImpl implements CommonDataService {
     public void insertGlobalTerms(List<GlobalTermsInsertRequestDto> requestList) {
 
         if (requestList == null || requestList.isEmpty()) {
-            throw new IllegalArgumentException("No Global Terms entries provided");
+            throw new ValidationException("No Global Terms entries provided");
         }
 
+
         GlobalTermsInsertRequestDto first = requestList.get(0);
+
+        if (first.getTermsPoid() == null || first.getTermsPoid() == 0) {
+            throw new ValidationException("No Terms and Conditions Template selected...");
+        }
 
         if (first.getCompanyPoid() == null ||
                 first.getDocId() == null ||
                 first.getDocKeyPoid() == null ||
                 first.getDetRowId() == null) {
 
-            throw new IllegalArgumentException(
+            throw new ValidationException(
                     "Missing mandatory fields: groupPoid, companyPoid, docId, docKeyPoid, loginUserPoid, termsPoid"
             );
         }
