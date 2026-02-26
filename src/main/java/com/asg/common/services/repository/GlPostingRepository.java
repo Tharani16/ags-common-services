@@ -96,7 +96,7 @@ public class GlPostingRepository {
             dto.setDrAmt(rs.getBigDecimal("DR_AMT"));
             dto.setCrAmt(rs.getBigDecimal("CR_AMT"));
             dto.setPostedBy(rs.getString("POSTED_BY"));
-            dto.setPostedDate(LocalDate.from(convertToLocalDate(rs.getDate("POSTED_DATE")).atStartOfDay()).atStartOfDay());
+            dto.setPostedDate(rs.getTimestamp("POSTED_DATE").toLocalDateTime());
             entries.add(dto);
         }
 
