@@ -157,6 +157,7 @@
 	<parameter name="BL_TYPE" class="java.lang.String"/>
 	<parameter name="LEVEL_LIMIT" class="java.lang.String"/>
 	<parameter name="SALESMAN" class="java.lang.String"/>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT DISTINCT COMPANY_NAME,COMPANY_POID,SALESMAN_CODE
 FROM(
@@ -867,7 +868,7 @@ WHERE GCM.COMPANY_POID LIKE DECODE($P{COMPANY_POID},999,'%',$P{COMPANY_POID})
 				<textElement>
 					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="1030" y="1" width="56" height="20" forecolor="#999999" uuid="fef7cb34-bc2e-4a1f-9a55-4062cc4ab64f"/>

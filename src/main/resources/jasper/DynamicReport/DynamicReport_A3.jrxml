@@ -29,6 +29,7 @@
 	<parameter name="REPORT_FILTERS" class="java.lang.String">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT COMPANY_POID, COMPANY_NAME, ADDRESS, LOGO_IMAGE
 FROM GLOBAL_COMPANY_MASTER]]>
@@ -111,7 +112,7 @@ FROM GLOBAL_COMPANY_MASTER]]>
 					<textElement verticalAlignment="Middle">
 						<font size="10" isBold="false"/>
 					</textElement>
-					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>

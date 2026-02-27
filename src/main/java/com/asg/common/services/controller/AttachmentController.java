@@ -551,21 +551,18 @@ public class AttachmentController {
             @PathVariable String fileNameMapped
     ){
 
-        // Check user authorization (placeholder - implement actual authorization logic)
         if (!hasDownloadPermission(docId, docKeyPoid)) {
             return error("Access denied", 403);
         }
 
-        // Get attachment info first to validate existence in DB
+        // Get attachment info (validates + logs)
         AttachmentDto attachmentInfo = attachmentService.getAttachmentInfo(docId, docKeyPoid, fileNameMapped);
 
-        // Download the file resource
+        // Download file
         Resource resource = attachmentService.downloadAttachment(docId, docKeyPoid, fileNameMapped);
 
-        // Determine MIME type
         String contentType = attachmentService.resolveContentType(attachmentInfo.getOriginalFileName());
 
-        // Stream file with proper headers
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION,

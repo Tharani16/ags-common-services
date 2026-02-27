@@ -156,6 +156,7 @@
 		<defaultValueExpression><![CDATA["//shippingbahrain.com/data/ERP_REPORTS/Reports/"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="SUB_HEADER" class="net.sf.jasperreports.engine.JasperReport"/>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT DISTINCT COMPANY_NAME,COMPANY_POID
 FROM(
@@ -894,7 +895,7 @@ WHERE GCM.COMPANY_POID LIKE DECODE($P{COMPANY_POID},999,'%',$P{COMPANY_POID})
 				<textElement>
 					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="713" y="0" width="58" height="20" forecolor="#999999" uuid="36ae91c3-b91f-42eb-977a-945d0dca8a27"/>
