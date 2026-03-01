@@ -1,5 +1,7 @@
 package com.asg.common.services.controller;
 
+import com.asg.common.lib.annotation.AllowedAction;
+import com.asg.common.lib.enums.UserRolesRightsEnum;
 import com.asg.common.services.dto.*;
 import com.asg.common.services.enums.ApprovalAction;
 import com.asg.common.services.service.ApprovalService;
@@ -116,6 +118,7 @@ public class ApprovalController {
         }
     }
 
+
     @Operation(
             summary = "Get approval status and button states",
             description = """
@@ -171,6 +174,7 @@ public class ApprovalController {
                     )
             }
     )
+    @AllowedAction(UserRolesRightsEnum.VIEW)
     @GetMapping("/status")
     public ResponseEntity<?> getApprovalStatus(
             @Parameter(description = "Document ID", required = true)
