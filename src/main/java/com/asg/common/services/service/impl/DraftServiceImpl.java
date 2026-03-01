@@ -60,9 +60,11 @@ public class DraftServiceImpl implements DraftService {
 
     @Transactional
     public boolean deleteDraft(String docId, Long companyId, Long userId) {
-        long count = repository.deleteByDocIdAndCompanyPoidAndUserPoid(docId, companyId, userId);
-        log.debug("Deleted {} draft for docId={}, companyId={}, userId={}", count, docId, companyId, userId);
-        return count > 0;
+        Optional<Draft> draft = repository.findByDocIdAndCompanyPoidAndUserPoid(docId, companyId, userId);
+        draft.ifPresent(repository::delete);
+        log.debug("Deleted draft for docId={}, companyId={}, userId={}", docId, companyId, userId);
+
+        return draft.isPresent();
     }
 
     private String serialize(JsonNode node) {
