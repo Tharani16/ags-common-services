@@ -135,7 +135,12 @@ public class GlPostingRepository {
             dto.setGlCode(rs.getString("GL_CODE"));
             dto.setGlDescription(rs.getString("GL_DESCRIPTION"));
             dto.setCostGroup(rs.getString("COST_GROUP"));
-            dto.setCostPoid(rs.getLong("COST_POID"));
+            String costPoidStr = rs.getString("COST_POID");
+            try {
+                dto.setCostPoid(StringUtils.isNotBlank(costPoidStr) ? Long.parseLong(costPoidStr.trim()) : null);
+            } catch (NumberFormatException e) {
+                dto.setCostPoid(null);
+            }
             dto.setAmt(rs.getBigDecimal("AMT"));
             dto.setGlCompany(rs.getString("GL_COMPANY"));
             entries.add(dto);
