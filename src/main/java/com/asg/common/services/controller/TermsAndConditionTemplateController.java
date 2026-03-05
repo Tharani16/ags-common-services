@@ -22,10 +22,10 @@ public class TermsAndConditionTemplateController {
 
     private final TermsAndConditionTemplateService termsAndConditionTemplateServiceImpl;
 
-    @Operation(summary = "Get parameter value by name", description = "Retrieve parameter value from GLOBAL_PARAMETERS table by parameter name")
+    @Operation(summary = "Get terms and condition template", description = "Retrieve terms and condition template by parameter name and LOV name")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Parameter value retrieved successfully"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Parameter not found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Terms and condition template retrieved successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Template not found"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/default-value/{parameterName}/{lovName}")
