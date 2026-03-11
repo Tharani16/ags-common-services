@@ -15,6 +15,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -196,7 +197,11 @@ public class ApprovalRepository {
         builder.statusCode(statusCode);
         builder.statusDetails(statusDetails);
 
-        boolean isApprover = approverUserRoles != null && approverUserRoles.contains(loginUserPoid);
+        boolean isApprover = false;
+        if (approverUserRoles != null && !approverUserRoles.isEmpty()) {
+            List<String> approverList = Arrays.asList(approverUserRoles.split(","));
+            isApprover = approverList.contains(loginUserPoid);
+        }
 
         switch (statusCode) {
             case "APPROVAL_NOT_APPLICABLE":
