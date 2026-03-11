@@ -12,6 +12,7 @@ import com.asg.common.lib.dto.response.StockDetailsResponse;
 import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
 import com.asg.common.lib.exception.ValidationException;
 import com.asg.common.lib.security.util.UserContext;
+import com.asg.common.lib.service.LoggingService;
 import com.asg.common.lib.service.LovDataService;
 import com.asg.common.services.client.TaxServiceClient;
 import com.asg.common.services.client.GLMasterServiceClient;
@@ -38,6 +39,7 @@ public class CommonDataServiceImpl implements CommonDataService {
     private final StockServiceClient stockServiceClient;
     private final GlobalTermsConditionRepository globalTermsConditionRepository;
     private final LovDataService lovService;
+    private final LoggingService loggingService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -88,10 +90,14 @@ public class CommonDataServiceImpl implements CommonDataService {
     @Transactional
     public void insertGlobalTerms(List<GlobalTermsInsertRequestDto> requestList) {
 
-        if (requestList == null || requestList.isEmpty()) {
+        if (requestList == null) {
             throw new ValidationException("No Global Terms entries provided");
         }
 
+        // Handle empty list — user deleted all rows (legacy: deleteCustomChanges)
+        if (requestList.isEmpty()) {
+            return;
+        }
 
         GlobalTermsInsertRequestDto first = requestList.get(0);
 
@@ -110,6 +116,12 @@ public class CommonDataServiceImpl implements CommonDataService {
         }
 
         globalTermsConditionRepository.insertGlobalTerms(requestList);
+
+        loggingService.createLogSummaryEntry(
+                first.getDocId(),
+                first.getDocKeyPoid().toString(),
+                "Terms and Conditions modified..."
+        );
     }
 
     @Override
@@ -127,6 +139,8 @@ public class CommonDataServiceImpl implements CommonDataService {
                 docKeyPoid,
                 userPoid
         );
+        loggingService.createLogSummaryEntry(documentId, docKeyPoid.toString(),
+                "Custom Terms and Conditions deleted...");
     }
 
     @Override
