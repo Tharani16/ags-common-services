@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.StoredProcedureQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
 
@@ -166,6 +168,8 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
             Date fromDate,
             Date toDate
     ) {
+        log.info("Calling PROC_GLOB_APPROVAL_PENDING_V2 with params - userPoid: {}, status: {}, fromDate: {}, toDate: {}", 
+                userPoid, status, fromDate, toDate);
 
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("PROC_GLOB_APPROVAL_PENDING_V2");
@@ -185,27 +189,43 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
 
         ResultSet rs = (ResultSet) query.getOutputParameterValue("OUTDATA");
 
-        return mapResultSetForApproval(rs);
+        List<ApprovalPendingDto> result = mapResultSetForApproval(rs);
+        log.info("PROC_GLOB_APPROVAL_PENDING_V2 returned {} records", result.size());
+        
+        return result;
     }
 
     private List<ApprovalPendingDto> mapResultSetForApproval(ResultSet rs) {
         List<ApprovalPendingDto> list = new ArrayList<>();
 
         try {
+            int rowCount = 0;
             while (rs.next()) {
-
+                rowCount++;
                 ApprovalPendingDto dto = new ApprovalPendingDto();
 
-                dto.setDocKeyPoid(rs.getString("DOC_KEY_POID"));
+                dto.setDocKeyPoid(rs.getLong("DOC_KEY_POID"));
                 dto.setDocId(rs.getString("DOC_ID"));
                 dto.setDocName(rs.getString("DOC_NAME"));
                 dto.setActionType(rs.getString("ACTION_TYPE"));
-                dto.setActionedDatetime(rs.getTimestamp("ACTIONED_DATETIME"));
+                
+                java.sql.Timestamp timestamp = rs.getTimestamp("ACTIONED_DATETIME");
+                if (timestamp != null) {
+                    dto.setActionedDatetime(timestamp.toLocalDateTime());
+                }
 
                 list.add(dto);
+                
+                if (rowCount <= 5) {
+                    log.debug("Row {}: docKeyPoid={}, docId={}, docName={}, actionType={}, actionedDatetime={}",
+                            rowCount, dto.getDocKeyPoid(), dto.getDocId(), dto.getDocName(), 
+                            dto.getActionType(), dto.getActionedDatetime());
+                }
             }
+            log.info("Total rows mapped from ResultSet: {}", rowCount);
 
         } catch (SQLException e) {
+            log.error("Error mapping approval pending list", e);
             throw new RuntimeException("Error mapping approval pending list", e);
         }
 

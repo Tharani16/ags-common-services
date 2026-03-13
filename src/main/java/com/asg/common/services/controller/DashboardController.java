@@ -255,12 +255,12 @@ public class DashboardController {
     }
 
     @Operation(
-            summary = "Get approval pending list",
-            description = "Retrieves list of items pending for approval based on the provided criteria",
+            summary = "Get dashboard approvals",
+            description = "Retrieves approval dashboard data with support for Pending and Completed tabs",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Successfully retrieved approval pending list",
+                            description = "Successfully retrieved approvals",
                             content = @Content(mediaType = "application/json")
                     ),
                     @ApiResponse(
@@ -281,25 +281,22 @@ public class DashboardController {
             },
             tags = {"Dashboard"}
     )
-
-    @GetMapping("/approval-pending-list")
-    public List<ApprovalPendingDto> getApprovalPendingList(
-            @Parameter(description = "Approval status filter (ALL, APPROVED, PENDING)", required = false)
+    @GetMapping("/approvals")
+    public ResponseEntity<?> getApprovals(
+            @Parameter(description = "Approval status filter: PENDING (Pending tab) / APPROVED (Completed tab) / ALL", required = false, example = "PENDING")
             @RequestParam(required = false, defaultValue = "ALL") String status,
             @Parameter(description = "Start date of the range", required = true, example = "2025-01-01")
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
             @Parameter(description = "End date of the range", required = true, example = "2025-12-31")
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate,
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
     ) {
-        return dashboardService.fetchApprovalPendingList(
+        List<ApprovalPendingDto> approvals = dashboardService.fetchApprovalPendingList(
                 String.valueOf(UserContext.getUserPoid()),
                 status,
                 fromDate,
-                toDate);
+                toDate
+        );
+        return success("Approvals retrieved successfully", approvals);
     }
 
     @Operation(
