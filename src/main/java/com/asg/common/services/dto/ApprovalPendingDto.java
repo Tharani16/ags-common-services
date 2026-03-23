@@ -2,13 +2,13 @@ package com.asg.common.services.dto;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class ApprovalPendingDto {
-    private String docKeyPoid;
+    private Long docKeyPoid;
     private String docId;
     private String docName;
     private String actionType;
-    private Date actionedDatetime;
+    private LocalDateTime actionedDatetime;
 }
