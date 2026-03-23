@@ -207,7 +207,31 @@ public class DashboardController {
     }
 
     @Operation(
-            summary = "Get favorite menu",
+            summary = "Get recent transactions",
+            description = "Retrieves current week's recent transactions for the logged-in user, sorted by latest, limited to top 15",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved recent transactions",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            },
+            tags = {"Dashboard"}
+    )
+    @GetMapping("/recent-transactions")
+    public ResponseEntity<?> getRecentTransactions() {
+        try {
+            List<RecentDocumentDto> result = dashboardService.fetchRecentTransactions(
+                    UserContext.getUserId(), UserContext.getUserPoid());
+            return success("Recent transactions retrieved successfully", result);
+        } catch (Exception e) {
+            log.error("Error while fetching recent transactions", e);
+            throw new RuntimeException("Error retrieving recent transactions: " + e.getMessage(), e);
+        }
+    }
+
+    @Operation(
             description = "Retrieves user's favorite menu items based on the provided criteria",
             responses = {
                     @ApiResponse(
@@ -314,15 +338,8 @@ public class DashboardController {
     )
 
     @GetMapping("/weekly-transactions")
-    public List<WeeklyTransactionDto> getWeeklyTransactions(
-            @Parameter(description = "Start period of the week (format: yyyy-MM-dd)", required = true, example = "2025-11-01")
-            @RequestParam String periodFrom,
-            @Parameter(description = "End period of the week (format: yyyy-MM-dd)", required = true, example = "2025-11-07")
-            @RequestParam String periodTo
-    ) {
+    public List<WeeklyTransactionDto> getWeeklyTransactions() {
         return dashboardService.fetchWeeklyTransactions(
-                String.valueOf(UserContext.getUserPoid()),
-                periodFrom,
-                periodTo);
+                String.valueOf(UserContext.getUserPoid()));
     }
 }
