@@ -76,6 +76,7 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
 
     @Override
     public List<RecentDocumentDto> getRecentDocumentList(String userId, Long userPoid) {
+        log.info("Calling PROC_GLOB_RECENT_DOC_LIST for userPoid: {}", userPoid);
 
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("PROC_GLOB_RECENT_DOC_LIST");
@@ -90,8 +91,9 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
         query.execute();
 
         ResultSet rs = (ResultSet) query.getOutputParameterValue("P_REC_DOC_OUTDATA");
-
-        return mapResultSetForRecentDocument(rs);
+        List<RecentDocumentDto> result = mapResultSetForRecentDocument(rs);
+        log.info("PROC_GLOB_RECENT_DOC_LIST returned {} records", result.size());
+        return result;
     }
 
     private List<RecentDocumentDto> mapResultSetForRecentDocument(ResultSet rs) {
