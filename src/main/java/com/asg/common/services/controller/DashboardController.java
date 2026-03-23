@@ -155,10 +155,6 @@ public class DashboardController {
     )
     @GetMapping("/submit-status")
     public List<UserApprovalSubmitStatusDto> getUserApprovalSubmitStatus(
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested,
             @Parameter(description = "Status filter: ALL/APPROVED/PENDING", example = "ALL")
             @RequestParam(required = false, defaultValue = "ALL") String status,
             @Parameter(description = "Start date for filtering submissions", example = "2025-11-01")
@@ -205,12 +201,7 @@ public class DashboardController {
     )
 
     @GetMapping("/recent-documents")
-    public List<RecentDocumentDto> getRecentDocuments(
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
-    ) {
+    public List<RecentDocumentDto> getRecentDocuments() {
         return dashboardService.fetchRecentDocuments(
                 UserContext.getUserId(), UserContext.getUserPoid());
     }
@@ -244,12 +235,7 @@ public class DashboardController {
     )
 
     @GetMapping("/favorite-menu")
-    public List<FavoriteMenuDto> getFavoriteMenu(
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
-    ) {
+    public List<FavoriteMenuDto> getFavoriteMenu() {
         return dashboardService.fetchFavoriteMenu(
                 UserContext.getUserId(), UserContext.getUserPoid());
     }
@@ -332,11 +318,7 @@ public class DashboardController {
             @Parameter(description = "Start period of the week (format: yyyy-MM-dd)", required = true, example = "2025-11-01")
             @RequestParam String periodFrom,
             @Parameter(description = "End period of the week (format: yyyy-MM-dd)", required = true, example = "2025-11-07")
-            @RequestParam String periodTo,
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
+            @RequestParam String periodTo
     ) {
         return dashboardService.fetchWeeklyTransactions(
                 String.valueOf(UserContext.getUserPoid()),
