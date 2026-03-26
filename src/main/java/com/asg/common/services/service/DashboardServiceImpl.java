@@ -6,10 +6,10 @@ import com.asg.common.services.entity.DashboardEntity;
 import com.asg.common.services.repository.CustomDashboardRepository;
 import com.asg.common.services.repository.DashboardRepository;
 import com.asg.common.services.service.impl.DashboardService;
+import com.asg.common.lib.security.util.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,27 +36,27 @@ public class DashboardServiceImpl implements DashboardService {
 
 
     @Override
-    public PendingApprovalResponse getDashboardEntity(Long groupPoid, Long companyPoid, Long userPoid, Pageable pageable) {
-        List<DashboardEntity> dashboardEntities=dashboardRepository.getPendingApprovals(groupPoid, companyPoid, userPoid);
-        // Apply pagination
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), dashboardEntities.size());
+    public PendingApprovalResponse getDashboardEntity() {
+        // Use logged-in context instead of passing POIDs from FE
+        Long groupPoid = UserContext.getGroupPoid();
+        Long companyPoid = UserContext.getCompanyPoid();
+        Long userPoid = UserContext.getUserPoid();
 
-        // Get sublist for the current page
-        List<DashboardEntity> pageContent = dashboardEntities.subList(start, end);
+        // FE will handle filtering/sorting, so return full list
+        List<DashboardEntity> dashboardEntities = dashboardRepository.getPendingApprovals(groupPoid, companyPoid, userPoid);
 
-        // Convert only the paginated entities to DTOs
-        List<PendingApprovalsDto> pendingApprovalsDtos = pageContent.stream()
+        List<PendingApprovalsDto> pendingApprovalsDtos = dashboardEntities.stream()
                 .map(this::fromEntity)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         // Create and populate response
         PendingApprovalResponse response = new PendingApprovalResponse();
         response.setPendingApprovals(pendingApprovalsDtos);
-        response.setPageNumber(pageable.getPageNumber());
+        response.setPageNumber(0);
         response.setPageSize(pendingApprovalsDtos.size());
         response.setTotalElements(dashboardEntities.size());
-        response.setTotalPages((int) Math.ceil((double) dashboardEntities.size() / pageable.getPageSize()));
+        response.setTotalPages(1);
        return response;
     }
 

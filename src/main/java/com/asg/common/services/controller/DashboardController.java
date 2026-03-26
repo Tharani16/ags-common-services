@@ -5,17 +5,12 @@ import com.asg.common.services.dto.*;
 import com.asg.common.services.service.impl.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -47,9 +42,8 @@ public class DashboardController {
 
 
     /**
-     * Retrieves a list of pending approvals based on the provided criteria in the request body.
-     *
-     * @param dto The dashboard DTO containing group, company, and user information
+     * Retrieves a list of pending approvals for the logged-in user (from `UserContext`).
+     * This endpoint does not take a request body.
      * @return ResponseEntity containing the list of pending approvals or an error message
      *
      * @apiNote This endpoint requires valid authentication and proper authorization
@@ -58,14 +52,49 @@ public class DashboardController {
      */
     @Operation(
             summary = "Get pending approvals",
-            description = "Retrieves a list of pending approval items based on the provided criteria in the request body",
+            description = "Retrieves a list of pending approval items for the logged-in user (from `UserContext`). No request body is required.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Successfully retrieved pending approvals",
                             content = @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = PendingApprovalsDto.class))
+                                    schema = @Schema(example = """
+                                            {
+                                              "success": true,
+                                              "message": "Pending approvals retrieved successfully",
+                                              "statusCode": 200,
+                                              "result": {
+                                                "data": {
+                                                  "PendingApprovals": [
+                                                    {
+                                                      "id": 1,
+                                                      "companyPoid": 1,
+                                                      "groupPoid": 1,
+                                                      "docId": "200-101",
+                                                      "docShortName": "Purchase Order",
+                                                      "docKeyPoid": 90222,
+                                                      "docRef": "ASG14100",
+                                                      "docDate": null,
+                                                      "docSummaryInfo": "DOC REF : ASG14100  /  SUPPLIER NAME : test1211  /  REMARKS :   ",
+                                                      "userId": "HEXAUSER2",
+                                                      "userRolePoid": 126,
+                                                      "userPoid": 0,
+                                                      "actionStatus": "SUBMIT_FOR_APPROVAL",
+                                                      "actionedBy": "4894",
+                                                      "userName": "HEXAUSER2",
+                                                      "datetime": "2026-03-25T05:05:42.642+00:00",
+                                                      "comments": null
+                                                    }
+                                                  ],
+                                                  "totalElements": 1,
+                                                  "totalPages": 1,
+                                                  "pageNumber": 0,
+                                                  "pageSize": 1
+                                                }
+                                              }
+                                            }
+                                            """)
                             )
                     ),
                     @ApiResponse(
@@ -95,30 +124,15 @@ public class DashboardController {
 
 
     @PostMapping("/pending-approvals")
-    public ResponseEntity<?> getPendingApprovals(
-            @ParameterObject Pageable pageable,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Dashboard request object containing group, company, and user information",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = DashboardDto.class),
-                            examples = @ExampleObject(
-                                    name = "DashboardRequest",
-                                    value = "{\"groupPoid\": 1, \"companyPoid\": 1, \"userPoid\": 1902}",
-                                    summary = "Example dashboard request"
-                            )
-                    )
-            )
-            @Valid @RequestBody DashboardDto dto) {
+    public ResponseEntity<?> getPendingApprovals() {
         try {
-            PendingApprovalResponse pendingApprovals = dashboardService.getDashboardEntity(dto.getGroupPoid(), dto.getCompanyPoid(), dto.getUserPoid(),pageable);
+            PendingApprovalResponse<?> pendingApprovals = dashboardService.getDashboardEntity();
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("PendingApprovals", pendingApprovals.getPendingApprovals());
-            responseData.put("pageNumber", pageable.getPageNumber());
-            responseData.put("pageSize", pageable.getPageSize());
             responseData.put("totalElements", pendingApprovals.getTotalElements());
             responseData.put("totalPages",pendingApprovals.getTotalPages());
+            responseData.put("pageNumber", pendingApprovals.getPageNumber());
+            responseData.put("pageSize", pendingApprovals.getPageSize());
             return success("Pending approvals retrieved successfully", responseData);
         } catch (Exception e) {
             log.error("Error while fetching pending approvals", e);
