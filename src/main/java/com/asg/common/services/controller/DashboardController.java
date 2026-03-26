@@ -11,11 +11,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -95,30 +92,15 @@ public class DashboardController {
 
 
     @PostMapping("/pending-approvals")
-    public ResponseEntity<?> getPendingApprovals(
-            @ParameterObject Pageable pageable,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Dashboard request object containing group, company, and user information",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = DashboardDto.class),
-                            examples = @ExampleObject(
-                                    name = "DashboardRequest",
-                                    value = "{\"groupPoid\": 1, \"companyPoid\": 1, \"userPoid\": 1902}",
-                                    summary = "Example dashboard request"
-                            )
-                    )
-            )
-            @Valid @RequestBody DashboardDto dto) {
+    public ResponseEntity<?> getPendingApprovals() {
         try {
-            PendingApprovalResponse pendingApprovals = dashboardService.getDashboardEntity(dto.getGroupPoid(), dto.getCompanyPoid(), dto.getUserPoid(),pageable);
+            PendingApprovalResponse pendingApprovals = dashboardService.getDashboardEntity();
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("PendingApprovals", pendingApprovals.getPendingApprovals());
-            responseData.put("pageNumber", pageable.getPageNumber());
-            responseData.put("pageSize", pageable.getPageSize());
             responseData.put("totalElements", pendingApprovals.getTotalElements());
             responseData.put("totalPages",pendingApprovals.getTotalPages());
+            responseData.put("pageNumber", pendingApprovals.getPageNumber());
+            responseData.put("pageSize", pendingApprovals.getPageSize());
             return success("Pending approvals retrieved successfully", responseData);
         } catch (Exception e) {
             log.error("Error while fetching pending approvals", e);
