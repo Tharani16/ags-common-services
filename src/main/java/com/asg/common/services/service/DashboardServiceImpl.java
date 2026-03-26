@@ -141,7 +141,8 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<WeeklyTransactionDto> fetchWeeklyTransactions(String loginUserPoid) {
         LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("dd-MMM-yyyy", java.util.Locale.ENGLISH);
         String periodFrom = today.with(DayOfWeek.MONDAY).format(formatter);
         String periodTo = today.with(DayOfWeek.SUNDAY).format(formatter);
         return customDashboardRepository.getWeeklyTransactions(loginUserPoid, periodFrom, periodTo);
