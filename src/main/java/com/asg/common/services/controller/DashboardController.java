@@ -147,7 +147,31 @@ public class DashboardController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Successfully retrieved user submit status",
-                            content = @Content(mediaType = "application/json")
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(example = """
+                                            {
+                                              "success": true,
+                                              "message": "User submit status retrieved successfully",
+                                              "statusCode": 200,
+                                              "result": {
+                                                "data": [
+                                                  {
+                                                    "submittedBy": "4894",
+                                                    "submittedByName": "John Doe",
+                                                    "docName": "Purchase Order",
+                                                    "docId": "200-101",
+                                                    "docKeyPoid": "90222",
+                                                    "currentDocStatus": "PENDING",
+                                                    "nextApproverName": "Manager",
+                                                    "submitDate": "2026-03-25T05:05:42.642+00:00",
+                                                    "status": "PENDING"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                            """)
+                            )
                     ),
                     @ApiResponse(
                             responseCode = "400",
@@ -168,7 +192,7 @@ public class DashboardController {
             tags = {"Dashboard"}
     )
     @GetMapping("/submit-status")
-    public List<UserApprovalSubmitStatusDto> getUserApprovalSubmitStatus(
+    public ResponseEntity<?> getUserApprovalSubmitStatus(
             @Parameter(description = "Status filter: ALL/APPROVED/PENDING", example = "ALL")
             @RequestParam(required = false, defaultValue = "ALL") String status,
             @Parameter(description = "Start date for filtering submissions", example = "2025-11-01")
@@ -178,12 +202,13 @@ public class DashboardController {
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
     ) {
-        return dashboardService.fetchUserSubmitStatus(
+        List<UserApprovalSubmitStatusDto> result = dashboardService.fetchUserSubmitStatus(
                 String.valueOf(UserContext.getUserPoid()),
                 status,
                 fromDate,
                 toDate
         );
+        return success("User submit status retrieved successfully", result);
     }
 
     @Operation(
