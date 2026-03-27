@@ -377,8 +377,16 @@ public class DashboardController {
     )
 
     @GetMapping("/weekly-transactions")
-    public List<WeeklyTransactionDto> getWeeklyTransactions() {
-        return dashboardService.fetchWeeklyTransactions(
-                String.valueOf(UserContext.getUserPoid()));
+    public ResponseEntity<?> getWeeklyTransactions() {
+        try {
+            List<WeeklyTransactionDto> result = dashboardService.fetchWeeklyTransactions(
+                    String.valueOf(UserContext.getUserPoid()));
+
+            return success("Weekly transactions retrieved successfully", result);
+
+        } catch (Exception e) {
+            log.error("Error while fetching weekly transactions", e);
+            throw new RuntimeException("Error retrieving weekly transactions: " + e.getMessage(), e);
+        }
     }
 }
