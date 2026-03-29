@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PendingApprovalResponse<T> {
+public class PendingApprovalResponse {
     private List<PendingApprovalsDto> pendingApprovals;
     private int pageNumber;
     private int pageSize;

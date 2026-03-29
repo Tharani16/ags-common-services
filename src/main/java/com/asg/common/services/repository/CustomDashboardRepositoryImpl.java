@@ -58,8 +58,11 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
                 dto.setSubmittedBy(rs.getString("SUBMITTED_BY"));
                 dto.setSubmittedByName(rs.getString("SUBMITTED_BY_NAME"));
                 dto.setDocName(rs.getString("DOC_NAME"));
+                dto.setDocShortName(getStringIfPresent(rs, "DOC_SHORT_NAME"));
+                dto.setRouteName(getStringIfPresent(rs, "ROUTE_NAME"));
+                dto.setDocRef(getStringIfPresent(rs, "DOC_REF"));
                 dto.setDocId(rs.getString("DOC_ID"));
-                dto.setDocKeyPoid(rs.getString("DOC_KEY_POID"));
+                dto.setDocKeyPoid(getDocKeyPoidAsString(rs));
                 dto.setCurrentDocStatus(rs.getString("CURRENT_DOC_STATUS"));
                 dto.setNextApproverName(rs.getString("NEXT_APPROVER_NAME"));
                 dto.setSubmitDate(rs.getTimestamp("SUBMIT_DATE"));
@@ -104,6 +107,15 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
                 RecentDocumentDto dto = new RecentDocumentDto();
 
                 dto.setDocType(rs.getString("DOC_TYPE"));
+                String shortName = getStringIfPresent(rs, "DOC_SHORT_NAME");
+                if (shortName == null || shortName.isBlank()) {
+                    shortName = rs.getString("DOC_TYPE");
+                }
+                dto.setDocShortName(shortName);
+                dto.setDocName(getStringIfPresent(rs, "DOC_NAME"));
+                dto.setRouteName(getStringIfPresent(rs, "ROUTE_NAME"));
+                dto.setDocId(getStringIfPresent(rs, "DOC_ID"));
+                dto.setDocKeyPoid(getDocKeyPoidAsString(rs));
                 dto.setDocDate(rs.getString("DOC_DATE"));
                 dto.setDocRef(rs.getString("DOC_REF"));
 
@@ -206,9 +218,13 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
                 rowCount++;
                 ApprovalPendingDto dto = new ApprovalPendingDto();
 
-                dto.setDocKeyPoid(rs.getLong("DOC_KEY_POID"));
+                long docKey = rs.getLong("DOC_KEY_POID");
+                dto.setDocKeyPoid(rs.wasNull() ? null : docKey);
                 dto.setDocId(rs.getString("DOC_ID"));
                 dto.setDocName(rs.getString("DOC_NAME"));
+                dto.setDocShortName(getStringIfPresent(rs, "DOC_SHORT_NAME"));
+                dto.setRouteName(getStringIfPresent(rs, "ROUTE_NAME"));
+                dto.setDocRef(getStringIfPresent(rs, "DOC_REF"));
                 dto.setActionType(rs.getString("ACTION_TYPE"));
                 
                 java.sql.Timestamp timestamp = rs.getTimestamp("ACTIONED_DATETIME");
@@ -232,6 +248,30 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
         }
 
         return list;
+    }
+
+    private String getStringIfPresent(ResultSet rs, String column) throws SQLException {
+        try {
+            return rs.getString(column);
+        } catch (SQLException e) {
+            // Column may not exist yet in the stored procedure output (backward compatible fallback).
+            return null;
+        }
+    }
+
+    /**
+     * Reads DOC_KEY_POID whether the driver returns NUMBER or STRING (Oracle / ref cursor).
+     */
+    private String getDocKeyPoidAsString(ResultSet rs) throws SQLException {
+        try {
+            Object v = rs.getObject("DOC_KEY_POID");
+            if (v == null) {
+                return null;
+            }
+            return v.toString();
+        } catch (SQLException e) {
+            return null;
+        }
     }
 
     @Override

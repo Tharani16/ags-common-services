@@ -72,7 +72,9 @@ public class DashboardController {
                                                       "companyPoid": 1,
                                                       "groupPoid": 1,
                                                       "docId": "200-101",
-                                                      "docShortName": "Purchase Order",
+                                                      "docName": "Purchase Order",
+                                                      "docShortName": "PO",
+                                                      "routeName": "/procurement/po",
                                                       "docKeyPoid": 90222,
                                                       "docRef": "ASG14100",
                                                       "docDate": null,
@@ -126,7 +128,7 @@ public class DashboardController {
     @PostMapping("/pending-approvals")
     public ResponseEntity<?> getPendingApprovals() {
         try {
-            PendingApprovalResponse<?> pendingApprovals = dashboardService.getDashboardEntity();
+            PendingApprovalResponse pendingApprovals = dashboardService.getDashboardEntity();
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("PendingApprovals", pendingApprovals.getPendingApprovals());
             responseData.put("totalElements", pendingApprovals.getTotalElements());
@@ -160,6 +162,9 @@ public class DashboardController {
                                                     "submittedBy": "4894",
                                                     "submittedByName": "John Doe",
                                                     "docName": "Purchase Order",
+                                                    "docShortName": "PO",
+                                                    "routeName": "/procurement/po",
+                                                    "docRef": "ASG14100",
                                                     "docId": "200-101",
                                                     "docKeyPoid": "90222",
                                                     "currentDocStatus": "PENDING",
@@ -247,7 +252,7 @@ public class DashboardController {
 
     @Operation(
             summary = "Get recent transactions",
-            description = "Retrieves current week's recent transactions for the logged-in user, sorted by latest, limited to top 15",
+            description = "Retrieves current week's recent transactions for the logged-in user, sorted by latest, limited to top 15. Each item includes docId, docKeyPoid, docName, docShortName, routeName, docRef, docType, docDate.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully retrieved recent transactions",
                             content = @Content(mediaType = "application/json")),
