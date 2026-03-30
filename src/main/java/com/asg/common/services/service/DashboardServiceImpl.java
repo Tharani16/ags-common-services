@@ -2,70 +2,84 @@ package com.asg.common.services.service;
 
 
 import com.asg.common.services.dto.*;
-import com.asg.common.services.entity.DashboardEntity;
 import com.asg.common.services.repository.CustomDashboardRepository;
-import com.asg.common.services.repository.DashboardRepository;
 import com.asg.common.services.service.impl.DashboardService;
 import com.asg.common.lib.security.util.UserContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
-   private final DashboardRepository dashboardRepository;
    private final CustomDashboardRepository customDashboardRepository;
 
    @Autowired
-    public DashboardServiceImpl(DashboardRepository dashboardRepository, CustomDashboardRepository customDashboardRepository) {
-        this.dashboardRepository = dashboardRepository;
+    public DashboardServiceImpl(CustomDashboardRepository customDashboardRepository) {
        this.customDashboardRepository = customDashboardRepository;
    }
 
 
     @Override
     public PendingApprovalResponse getDashboardEntity() {
-        // Use logged-in context instead of passing POIDs from FE
-        Long groupPoid = UserContext.getGroupPoid();
-        Long companyPoid = UserContext.getCompanyPoid();
         Long userPoid = UserContext.getUserPoid();
+        // PROC_GLOB_APPROVAL_PENDING_V2 uses P_FROM_DATE / P_TO_DATE in the APPROVED branch; pass current week so Oracle does not receive NULL dates.
+        LocalDate today = LocalDate.now();
+        Date weekStart = java.sql.Date.valueOf(today.with(DayOfWeek.MONDAY));
+        Date weekEnd = java.sql.Date.valueOf(today.with(DayOfWeek.SUNDAY));
 
-        // FE will handle filtering/sorting, so return full list
-        List<DashboardEntity> dashboardEntities = dashboardRepository.getPendingApprovals(groupPoid, companyPoid, userPoid);
+        List<ApprovalPendingDto> approvalPendingList = customDashboardRepository.getApprovalPendingList(
+                String.valueOf(userPoid),
+                "PENDING",
+                weekStart,
+                weekEnd
+        );
 
-        List<PendingApprovalsDto> pendingApprovalsDtos = dashboardEntities.stream()
-                .map(this::fromEntity)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<PendingApprovalsDto> pendingApprovalsDtos = new ArrayList<>();
+        long rowId = 1;
+        for (ApprovalPendingDto row : approvalPendingList) {
+            PendingApprovalsDto dto = fromApprovalPending(row, rowId++);
+            if (dto != null) {
+                pendingApprovalsDtos.add(dto);
+            }
+        }
 
         // Create and populate response
         PendingApprovalResponse response = new PendingApprovalResponse();
         response.setPendingApprovals(pendingApprovalsDtos);
         response.setPageNumber(0);
         response.setPageSize(pendingApprovalsDtos.size());
-        response.setTotalElements(dashboardEntities.size());
+        response.setTotalElements(approvalPendingList.size());
         response.setTotalPages(1);
        return response;
     }
 
-    private PendingApprovalsDto fromEntity(DashboardEntity entity) {
-        if (entity == null) {
+    private PendingApprovalsDto fromApprovalPending(ApprovalPendingDto source, long id) {
+        if (source == null) {
             return null;
         }
         PendingApprovalsDto dto = new PendingApprovalsDto();
-        BeanUtils.copyProperties(entity, dto);
+        dto.setId(id);
+        dto.setDocId(source.getDocId());
+        dto.setDocKeyPoid(source.getDocKeyPoid());
+        dto.setDocName(source.getDocName());
+        dto.setDocShortName(source.getDocShortName());
+        dto.setDocRef(source.getDocRef());
+        dto.setRouteName(source.getRouteName());
+        dto.setActionStatus(source.getActionType());
+        if (source.getActionedDatetime() != null) {
+            dto.setDatetime(java.sql.Timestamp.valueOf(source.getActionedDatetime()));
+        }
         return dto;
     }
 
