@@ -6,6 +6,7 @@ public record RecentMenuDto(
         String menuLevel,
         String menuGroup,
         String taskflowUrl,
+        String routeName,
         String docType,
         String moduleId
 ) {}

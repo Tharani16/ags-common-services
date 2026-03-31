@@ -13,6 +13,9 @@ public class UserApprovalSubmitStatusDto {
     private String submittedBy;
     private String submittedByName;
     private String docName;
+    private String docShortName;
+    private String routeName;
+    private String docRef;
     private String docId;
     private String docKeyPoid;
     private String currentDocStatus;

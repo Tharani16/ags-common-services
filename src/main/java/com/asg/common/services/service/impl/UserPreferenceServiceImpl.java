@@ -102,6 +102,7 @@ public class UserPreferenceServiceImpl implements UserPreferenceService {
                             rs.getString("MENU_LEVEL"),
                             rs.getString("MENU_GROUP"),
                             rs.getString("TASKFLOW_URL"),
+                            rs.getString("ROUTE_NAME"),
                             rs.getString("DOC_TYPE"),
                             rs.getString("MODULE_ID")));
                 }
