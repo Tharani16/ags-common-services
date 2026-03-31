@@ -283,7 +283,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         
         // Get original filename before archiving
         AttachmentDto attachmentInfo = getAttachmentInfoForArchive(docId, docKeyPoid, fileNameMapped);
-        String originalFileName = attachmentInfo.getOriginalFileName();
+        String originalFileName = stripTimestampPrefixes(attachmentInfo.getOriginalFileName());
         
         // Call existing archive procedure
         attachmentRepository.archiveAttachment(getGroupPoid(), 1L, docId, docKeyPoid, fileNameMapped);
@@ -315,6 +315,10 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
         // Update active flag from N to Y
         attachmentRepository.activateAttachment(docId, docKeyPoid, fileNameMapped);
+
+        // Log attachment unarchive/activation
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_UNARCHIVED.getDescription(), stripTimestampPrefixes(attachment.getFileName()));
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
     }
 
     // BULK UPDATE
@@ -653,6 +657,16 @@ public class AttachmentServiceImpl implements AttachmentService {
     private String callEdiProc(Long groupPoid, Long companyPoid, String docId, Long docKeyPoid, Long ediJobPoid, String loginUser) {
         // Placeholder for actual logic
         return "SUCCESS";
+    }
+
+    /** Strips all leading ddMMyyyyHHmm_ timestamp prefixes from a filename. */
+    private String stripTimestampPrefixes(String fileName) {
+        if (fileName == null) return null;
+        // Pattern: 12 digits followed by underscore (ddMMyyyyHHmm_)
+        while (fileName.matches("^\\d{12}_.*")) {
+            fileName = fileName.substring(13);
+        }
+        return fileName;
     }
 
     @Override
