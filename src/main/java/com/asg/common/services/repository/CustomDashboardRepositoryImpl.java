@@ -226,6 +226,7 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
                 dto.setRouteName(getStringIfPresent(rs, "ROUTE_NAME"));
                 dto.setDocRef(getStringIfPresent(rs, "DOC_REF"));
                 dto.setActionType(rs.getString("ACTION_TYPE"));
+                dto.setDocDate(rs.getDate("DOC_DATE"));
                 
                 java.sql.Timestamp timestamp = rs.getTimestamp("ACTIONED_DATETIME");
                 if (timestamp != null) {
