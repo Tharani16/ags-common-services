@@ -3,6 +3,7 @@ package com.asg.common.services.dto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class ApprovalPendingDto {
@@ -14,4 +15,5 @@ public class ApprovalPendingDto {
     private String docRef;
     private String actionType;
     private LocalDateTime actionedDatetime;
+    private Date docDate;
 }

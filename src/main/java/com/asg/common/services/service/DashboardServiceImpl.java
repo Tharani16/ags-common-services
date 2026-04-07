@@ -76,6 +76,14 @@ public class DashboardServiceImpl implements DashboardService {
         dto.setDocShortName(source.getDocShortName());
         dto.setDocRef(source.getDocRef());
         dto.setRouteName(source.getRouteName());
+        dto.setDocDate(source.getDocDate());
+        dto.setUserId(UserContext.getUserId());
+        dto.setUserName(UserContext.getUserId());
+        if (UserContext.getUserPoid() != null) {
+            dto.setUserPoid(UserContext.getUserPoid());
+            dto.setActionedBy(String.valueOf(UserContext.getUserPoid()));
+        }
+        dto.setDocSummaryInfo(source.getDocRef() != null ? "DOC REF : " + source.getDocRef() : null);
         dto.setActionStatus(source.getActionType());
         if (source.getActionedDatetime() != null) {
             dto.setDatetime(java.sql.Timestamp.valueOf(source.getActionedDatetime()));
