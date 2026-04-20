@@ -21,7 +21,7 @@ AND (NVL(AMT_20_FT_BHD,0) + NVL(AMT_40_FT_BHD,0) + NVL(AMT_PER_BL_BHD,0) > 0)]]>
 			<staticText>
 				<reportElement x="0" y="18" width="30" height="18" uuid="196889db-d081-46fb-a9c6-11419be5d238"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[No]]></text>
 			</staticText>
@@ -34,14 +34,14 @@ AND (NVL(AMT_20_FT_BHD,0) + NVL(AMT_40_FT_BHD,0) + NVL(AMT_PER_BL_BHD,0) > 0)]]>
 			<staticText>
 				<reportElement x="310" y="19" width="52" height="18" uuid="2fb8973d-1e75-4dab-a117-8219a1ab9230"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Currency]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="30" y="18" width="280" height="18" uuid="6694a12a-9f5c-4bdc-9ab0-8585dd036d86"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Charges]]></text>
 			</staticText>
@@ -54,21 +54,21 @@ AND (NVL(AMT_20_FT_BHD,0) + NVL(AMT_40_FT_BHD,0) + NVL(AMT_PER_BL_BHD,0) > 0)]]>
 			<staticText>
 				<reportElement x="362" y="19" width="52" height="18" uuid="bd7ab928-f65a-4fe2-9925-56b0ab1936f8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[20_Ft]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="414" y="19" width="52" height="18" uuid="53540dd4-5e0b-461b-92f8-7b87cc6d9014"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[40_Ft]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="0" y="0" width="524" height="18" forecolor="#FFFFFF" backcolor="#000066" uuid="ab2f5e08-d045-42e2-ad72-af387b67287c"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="11" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
 					<paragraph leftIndent="3"/>
 				</textElement>
 				<text><![CDATA[IMPORT TARIFF]]></text>
@@ -76,7 +76,7 @@ AND (NVL(AMT_20_FT_BHD,0) + NVL(AMT_40_FT_BHD,0) + NVL(AMT_PER_BL_BHD,0) > 0)]]>
 			<staticText>
 				<reportElement x="466" y="19" width="52" height="18" uuid="f24e50e6-8bf7-4153-9196-5c3b9d2130f1"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[Per B/L]]></text>
 			</staticText>

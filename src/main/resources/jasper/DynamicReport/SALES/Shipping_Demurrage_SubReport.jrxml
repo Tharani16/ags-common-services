@@ -32,7 +32,7 @@ ORDER BY SEQ_NO]]>
 			<staticText>
 				<reportElement mode="Opaque" x="0" y="0" width="524" height="21" backcolor="#CCCCCC" uuid="54f83a2e-af6c-440b-8f3a-19269ad5e1f6"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="true"/ pdfFontName="Helvetica-Bold">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
 					<paragraph leftIndent="3"/>
 				</textElement>
 				<text><![CDATA[DEMURRAGE TARIFF]]></text>
