@@ -88,7 +88,7 @@ public class DynamicReportPrintService {
             }
             case "100-396" -> printService.load("DynamicReport/SH/SH_EXPORT_DAYBOOK_MONTHLY.jrxml");
             case "100-463", "100-473" -> {
-                params.put("SUBREPORT1", printService.load("DynamicReport/SALES/Shipping_Charges_Subreport.jrxml"));
+                params.put("SUBREPORT1", printService.load("DynamicReport/SALES/Shipping_Charges_SubReport.jrxml"));
                 params.put("SUBREPORT2", printService.load("DynamicReport/SALES/Shipping_Demurrage_SubReport.jrxml"));
                 params.put("SUBREPORT3", printService.load("DynamicReport/SALES/Shipping_Charges_Export_Subreport.jrxml"));
                 params.put("SUBREPORT4", printService.load("DynamicReport/SALES/Shipping_Detention_SubReport.jrxml"));
