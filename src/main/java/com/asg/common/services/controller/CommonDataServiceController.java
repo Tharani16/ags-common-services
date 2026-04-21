@@ -205,20 +205,15 @@ public class CommonDataServiceController {
             @RequestParam(required = false, defaultValue = "#{null}") String parameters
     ) {
 
-        Double rate = glMasterService.getCurrencyRate(
+        CurrencyRateResponseDto response = glMasterService.getCurrencyRate(
                 UserContext.getGroupPoid(),
                 UserContext.getCompanyPoid(),
                 UserContext.getUserPoid(),
-                null,
-                null,
+                docId,
+                docKeyPoid,
                 currencyCode,
-                null
+                parameters
         );
-
-        CurrencyRateResponseDto response = CurrencyRateResponseDto.builder()
-                .currencyCode(currencyCode)
-                .rate(rate)
-                .build();
 
         return success("Currency rate fetched successfully", response);
     }
