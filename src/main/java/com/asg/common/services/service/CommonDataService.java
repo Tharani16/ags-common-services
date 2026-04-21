@@ -6,6 +6,7 @@ import com.asg.common.lib.dto.request.GlobalTermsInsertRequestDto;
 import com.asg.common.lib.dto.response.GlobalTermsResponseDto;
 import com.asg.common.lib.dto.response.StockDetailsResponse;
 import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
+import com.asg.common.services.dto.CurrencyRateResponseDto;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public interface CommonDataService {
                                       Long docKeyPoid
     );
 
-    Double getCurrencyRate(
+    CurrencyRateResponseDto getCurrencyRate(
             Long groupPoid,
             Long companyPoid,
             Long userPoid,
