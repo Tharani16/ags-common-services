@@ -18,6 +18,7 @@ import com.asg.common.services.client.TaxServiceClient;
 import com.asg.common.services.client.GLMasterServiceClient;
 import com.asg.common.services.client.StockServiceClient;
 import com.asg.common.services.repository.GlobalTermsConditionRepository;
+import com.asg.common.services.dto.CurrencyRateResponseDto;
 import com.asg.common.services.service.CommonDataService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -212,7 +213,7 @@ public class CommonDataServiceImpl implements CommonDataService {
     }
 
     @Override
-    public Double getCurrencyRate(
+    public CurrencyRateResponseDto getCurrencyRate(
             Long groupPoid,
             Long companyPoid,
             Long userPoid,
@@ -223,7 +224,7 @@ public class CommonDataServiceImpl implements CommonDataService {
     ) {
 
         StoredProcedureQuery query = entityManager
-                .createStoredProcedureQuery("PROC_GLOB_CURRENCY_GETRATE");
+                .createStoredProcedureQuery("PROC_GLOB_CURRENCY_GETRATE_V2");
 
         query.registerStoredProcedureParameter("P_LOGIN_GROUP_POID", Long.class, jakarta.persistence.ParameterMode.IN);
         query.registerStoredProcedureParameter("P_LOGIN_COMPANY_POID", Long.class, jakarta.persistence.ParameterMode.IN);
@@ -234,6 +235,7 @@ public class CommonDataServiceImpl implements CommonDataService {
         query.registerStoredProcedureParameter("P_PARAMETERS", String.class, jakarta.persistence.ParameterMode.IN);
 
         query.registerStoredProcedureParameter("P_CURRENCY_RATE", Double.class, jakarta.persistence.ParameterMode.OUT);
+        query.registerStoredProcedureParameter("P_CURRENCY_DECIMALS", Integer.class, jakarta.persistence.ParameterMode.OUT);
 
         query.setParameter("P_LOGIN_GROUP_POID", groupPoid);
         query.setParameter("P_LOGIN_COMPANY_POID", companyPoid);
@@ -242,12 +244,18 @@ public class CommonDataServiceImpl implements CommonDataService {
         query.setParameter("P_DOC_KEY_POID", docKeyPoid);
         query.setParameter("P_CURRENCY_CODE", currencyCode);
         query.setParameter("P_PARAMETERS", parameters);
-
         query.execute();
 
         Object rate = query.getOutputParameterValue("P_CURRENCY_RATE");
+        Object decimals = query.getOutputParameterValue("P_CURRENCY_DECIMALS");
+        Double finalRate = (rate != null) ? ((Number) rate).doubleValue() : null;
+        Integer finalDecimals = (decimals != null) ? ((Number) decimals).intValue() : null;
 
-        return (rate != null) ? ((Number) rate).doubleValue() : null;
+        return CurrencyRateResponseDto.builder()
+                .currencyCode(currencyCode)
+                .rate(finalRate)
+                .currencyDecimals(finalDecimals)
+                .build();
     }
 
     @Override

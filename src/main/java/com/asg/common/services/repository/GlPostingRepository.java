@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import oracle.jdbc.OracleTypes;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
+import com.asg.common.lib.exception.ValidationException;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -190,6 +191,11 @@ public class GlPostingRepository {
             cs.execute();
             outPutMessage = cs.getString(7);
 
+            if (outPutMessage != null && outPutMessage.contains("ERROR")) {
+                log.error("GL posting failed: {}", outPutMessage);
+                throw new ValidationException("GL Posting failed: " + outPutMessage);
+            }
+            log.info("GL posting completed successfully: {}", outPutMessage);
         } catch (SQLException e) {
             log.error(" error : {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
