@@ -24,10 +24,12 @@ public class GlPostingServiceImpl implements GlPostingService {
 
     @Override
     public String glreposting(int loginGroupPoid, int loginCompanyPoid, int loginUserPoid, String docId, int transactionPoid, String docRef) {
-        String approvalStatus = approvalService.getApprovalStatus(docId, transactionPoid);
-        if (approvalStatus.startsWith("ERROR") || 
-            (!"APPROVED".equals(approvalStatus) && !"FINAL_APPROVAL_COMPLETED".equals(approvalStatus))) {
-            return "Document must be approved before GL re-posting can be performed. Status: " + approvalStatus;
+        if (!"300-111".equals(docId) && !"300-110".equals(docId)) {
+            String approvalStatus = approvalService.getApprovalStatus(docId, transactionPoid);
+            if (approvalStatus.startsWith("ERROR") || 
+                (!"APPROVED".equals(approvalStatus) && !"FINAL_APPROVAL_COMPLETED".equals(approvalStatus))) {
+                return "Document must be approved before GL re-posting can be performed. Status: " + approvalStatus;
+            }
         }
         return repository.glreposting(loginGroupPoid, loginCompanyPoid, loginUserPoid, docId, transactionPoid, docRef);
     }
