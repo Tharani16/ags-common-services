@@ -18,6 +18,9 @@ import com.asg.common.services.client.TaxServiceClient;
 import com.asg.common.services.client.GLMasterServiceClient;
 import com.asg.common.services.client.StockServiceClient;
 import com.asg.common.services.repository.GlobalTermsConditionRepository;
+import com.asg.common.services.dto.AddressDetailsListResponseDto;
+import com.asg.common.services.dto.AddressDetailsResponseDto;
+import com.asg.common.services.dto.AddressPoidResponseDto;
 import com.asg.common.services.dto.CurrencyRateResponseDto;
 import com.asg.common.services.service.CommonDataService;
 import jakarta.persistence.EntityManager;
@@ -29,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -309,6 +313,146 @@ public class CommonDataServiceImpl implements CommonDataService {
                 supplierPoid,
                 rfqPoid
         );
+    }
+
+    @Override
+    public AddressPoidResponseDto fetchAddressPoidByAssociatedData(
+            Long associatedAddressPoid,
+            String associatedAddressType
+    ) {
+        // Input validation
+        if (associatedAddressPoid == null) {
+            throw new ValidationException("Associated Address POID is required");
+        }
+        
+        if (associatedAddressType == null || associatedAddressType.trim().isEmpty()) {
+            associatedAddressType = "CUSTOMER"; // Default value
+        }
+
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("PROC_ADDRESS_GET_ASSOC_DET");
+
+        query.registerStoredProcedureParameter("P_ASSOCIATED_POID", Long.class, jakarta.persistence.ParameterMode.IN);
+        query.registerStoredProcedureParameter("P_ASSOCIATED_TYPE", String.class, jakarta.persistence.ParameterMode.IN);
+        query.registerStoredProcedureParameter("P_ADDRESS_MASTER_POID", Long.class, jakarta.persistence.ParameterMode.OUT);
+        query.registerStoredProcedureParameter("P_STATUS", String.class, jakarta.persistence.ParameterMode.OUT);
+
+        query.setParameter("P_ASSOCIATED_POID", associatedAddressPoid);
+        query.setParameter("P_ASSOCIATED_TYPE", associatedAddressType.toUpperCase());
+
+        try {
+            query.execute();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to execute address lookup procedure: " + e.getMessage(), e);
+        }
+
+        Object addressMasterPoidObj = query.getOutputParameterValue("P_ADDRESS_MASTER_POID");
+        String status = (String) query.getOutputParameterValue("P_STATUS");
+
+        // Handle procedure errors
+        if (status != null && status.startsWith("ERROR")) {
+            throw new ValidationException("Address lookup failed: " + status);
+        }
+
+        // Handle case where no address is found
+        if (addressMasterPoidObj == null) {
+            if (status != null && status.contains("no address")) {
+                // This is expected for entities without addresses
+                return new AddressPoidResponseDto(null);
+            } else {
+                throw new ValidationException("No address found for the given associated address POID: " + associatedAddressPoid);
+            }
+        }
+
+        Long addressMasterPoid;
+        try {
+            addressMasterPoid = ((Number) addressMasterPoidObj).longValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid address master POID format returned from database", e);
+        }
+
+        return new AddressPoidResponseDto(addressMasterPoid);
+    }
+
+    @Override
+    public AddressDetailsListResponseDto fetchAddressByMasterPoid(
+            Long addressMasterPoid
+    ) {
+        // Input validation
+        if (addressMasterPoid == null) {
+            throw new ValidationException("Address Master POID is required");
+        }
+
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("PROC_ADDRESS_GET_DETAILS_ALL");
+
+        query.registerStoredProcedureParameter("P_ADDRESS_MASTER_POID", Long.class, jakarta.persistence.ParameterMode.IN);
+        query.registerStoredProcedureParameter("P_ADDRESS_POID", Long.class, jakarta.persistence.ParameterMode.IN);
+        query.registerStoredProcedureParameter("OUTDATA", void.class, jakarta.persistence.ParameterMode.REF_CURSOR);
+
+        query.setParameter("P_ADDRESS_MASTER_POID", addressMasterPoid);
+        query.setParameter("P_ADDRESS_POID", null);
+
+        try {
+            query.execute();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to execute address details procedure: " + e.getMessage(), e);
+        }
+
+        Object cursor = query.getOutputParameterValue("OUTDATA");
+        
+        if (cursor == null) {
+            throw new RuntimeException("No data returned from address details procedure");
+        }
+        
+        List<AddressDetailsResponseDto> addressDetailsList = mapAddressCursorToList(cursor);
+        
+        // Check if any address details were found
+        if (addressDetailsList.isEmpty()) {
+            throw new ValidationException("No address details found for Address Master POID: " + addressMasterPoid);
+        }
+
+        return new AddressDetailsListResponseDto(addressDetailsList);
+    }
+
+    private List<AddressDetailsResponseDto> mapAddressCursorToList(Object cursor) {
+        List<AddressDetailsResponseDto> addressList = new ArrayList<>();
+
+        try {
+            ResultSet rs = (ResultSet) cursor;
+
+            while (rs.next()) {
+                AddressDetailsResponseDto address = new AddressDetailsResponseDto();
+                
+                address.setAddressMasterPoid(rs.getBigDecimal("ADDRESS_MASTER_POID") != null ? rs.getBigDecimal("ADDRESS_MASTER_POID").longValue() : null);
+                address.setAddressPoid(rs.getBigDecimal("ADDRESS_POID") != null ? rs.getBigDecimal("ADDRESS_POID").longValue() : null);
+                address.setAddressName(rs.getString("ADDRESS_NAME"));
+                address.setAddressType(rs.getString("ADDRESS_TYPE"));
+                address.setOffTel1(rs.getString("OFF_TEL1"));
+                address.setOffTel2(rs.getString("OFF_TEL2"));
+                address.setContactPerson(rs.getString("CONTACT_PERSON"));
+                address.setDesignation(rs.getString("DESIGNATION"));
+                address.setMobile(rs.getString("MOBILE"));
+                address.setFax(rs.getString("FAX"));
+                address.setEmail1(rs.getString("EMAIL1"));
+                address.setEmail2(rs.getString("EMAIL2"));
+                address.setWebsite(rs.getString("WEBSITE"));
+                address.setPoBox(rs.getString("PO_BOX"));
+                address.setOffNo(rs.getString("OFF_NO"));
+                address.setBldg(rs.getString("BLDG"));
+                address.setRoad(rs.getString("ROAD"));
+                address.setAreaCity(rs.getString("AREA_CITY"));
+                address.setState(rs.getString("STATE"));
+                address.setCountryPoid(rs.getBigDecimal("COUNTRY_POID") != null ? rs.getBigDecimal("COUNTRY_POID").longValue() : null);
+                address.setLandMark(rs.getString("LAND_MARK"));
+
+                addressList.add(address);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error reading address cursor", e);
+        }
+
+        return addressList;
     }
 
 }
