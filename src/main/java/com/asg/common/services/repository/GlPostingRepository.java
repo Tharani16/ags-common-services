@@ -6,6 +6,7 @@ import com.asg.common.lib.dto.LedgerEntryDto;
 import com.asg.common.lib.dto.VatBreakupDto;
 import com.asg.common.lib.dto.response.GlPostingViewResponseDto;
 import com.asg.common.lib.security.util.UserContext;
+import com.asg.common.lib.service.LovDataService;
 import lombok.extern.slf4j.Slf4j;
 import oracle.jdbc.OracleTypes;
 import org.apache.commons.lang3.StringUtils;
@@ -23,9 +24,11 @@ import java.util.List;
 public class GlPostingRepository {
 
     private final DataSource dataSource;
+    private final LovDataService lovDataService;
 
-    public GlPostingRepository(DataSource dataSource) {
+    public GlPostingRepository(DataSource dataSource, LovDataService lovDataService) {
         this.dataSource = dataSource;
+        this.lovDataService = lovDataService;
     }
 
     public GlPostingViewResponseDto getGlPostings(String docId, Long transactionPoid) throws SQLException {
@@ -137,11 +140,7 @@ public class GlPostingRepository {
             dto.setGlDescription(rs.getString("GL_DESCRIPTION"));
             dto.setCostGroup(rs.getString("COST_GROUP"));
             String costPoidStr = rs.getString("COST_POID");
-            try {
-                dto.setCostPoid(StringUtils.isNotBlank(costPoidStr) ? Long.parseLong(costPoidStr.trim()) : null);
-            } catch (NumberFormatException e) {
-                dto.setCostPoid(null);
-            }
+            dto.setCostPoid(StringUtils.isNotBlank(costPoidStr) ? costPoidStr.trim() : null);
             dto.setAmt(rs.getBigDecimal("AMT"));
             dto.setGlCompany(rs.getString("GL_COMPANY"));
             entries.add(dto);
