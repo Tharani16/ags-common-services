@@ -99,6 +99,7 @@ $P{CNT_TYPE} , $P{COM_YEAR} , $P{ORACLE_REF_CURSOR} )}]]>
 	<parameter name="BL_TYPE" class="java.lang.String"/>
 	<parameter name="CNT_TYPE" class="java.lang.String"/>
 	<parameter name="COM_YEAR" class="java.lang.String"/>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT DISTINCT COMPANY_NAME,CUSTOMER,LINE,LINE_NAME
 FROM(
@@ -527,7 +528,7 @@ Tues]]></text>
 				<textElement>
 					<font isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

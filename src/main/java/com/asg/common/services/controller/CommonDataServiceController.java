@@ -205,20 +205,15 @@ public class CommonDataServiceController {
             @RequestParam(required = false, defaultValue = "#{null}") String parameters
     ) {
 
-        Double rate = glMasterService.getCurrencyRate(
+        CurrencyRateResponseDto response = glMasterService.getCurrencyRate(
                 UserContext.getGroupPoid(),
                 UserContext.getCompanyPoid(),
                 UserContext.getUserPoid(),
-                null,
-                null,
+                docId,
+                docKeyPoid,
                 currencyCode,
-                null
+                parameters
         );
-
-        CurrencyRateResponseDto response = CurrencyRateResponseDto.builder()
-                .currencyCode(currencyCode)
-                .rate(rate)
-                .build();
 
         return success("Currency rate fetched successfully", response);
     }
@@ -264,6 +259,65 @@ public class CommonDataServiceController {
                 rfqPoid
         );
         return success("PO created from RFQ", result);
+    }
+
+    @Operation(
+            summary = "Fetch Address POID by Associated Data",
+            description = "Fetches address master POID using associated address POID and type via PROC_ADDRESS_GET_ASSOC_DET procedure.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Address POID fetched successfully",
+                            content = @Content(schema = @Schema(implementation = AddressPoidResponseDto.class))
+                    ),
+                    @ApiResponse(responseCode = "400", description = "Invalid input provided"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+                    @ApiResponse(responseCode = "404", description = "Address record not found")
+            },
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @GetMapping("/fetch-address-poid-by-associated-data")
+    public ResponseEntity<?> fetchAddressPoidByAssociatedData(
+            @Parameter(description = "Associated Address POID", required = true, example = "12345")
+            @RequestParam Long associatedAddressPoid,
+
+            @Parameter(description = "Associated Address Type (CUSTOMER, SUPPLIER, PRINCIPAL)", required = false, example = "CUSTOMER")
+            @RequestParam(required = false, defaultValue = "CUSTOMER") String associatedAddressType
+    ) {
+        AddressPoidResponseDto response = glMasterService.fetchAddressPoidByAssociatedData(
+                associatedAddressPoid, 
+                associatedAddressType
+        );
+        
+        if (response.getAddressMasterPoid() == null) {
+            return success("No address found for the given associated address POID", response);
+        }
+        
+        return success("Address POID fetched successfully", response);
+    }
+
+    @Operation(
+            summary = "Fetch Address Details by Master POID",
+            description = "Fetches complete address details using address master POID via PROC_ADDRESS_GET_DETAILS_ALL procedure.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Address details fetched successfully",
+                            content = @Content(schema = @Schema(implementation = AddressDetailsListResponseDto.class))
+                    ),
+                    @ApiResponse(responseCode = "400", description = "Invalid input provided"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+                    @ApiResponse(responseCode = "404", description = "Address record not found")
+            },
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @GetMapping("/fetch-address-by-master-poid")
+    public ResponseEntity<?> fetchAddressByMasterPoid(
+            @Parameter(description = "Address Master POID", required = true, example = "67890")
+            @RequestParam Long addressMasterPoid
+    ) {
+        AddressDetailsListResponseDto response = glMasterService.fetchAddressByMasterPoid(addressMasterPoid);
+        return success("Address details fetched successfully", response);
     }
 
 }

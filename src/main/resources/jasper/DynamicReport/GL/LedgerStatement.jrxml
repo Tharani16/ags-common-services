@@ -54,6 +54,7 @@
 		<parameter name="GL_POID" class="java.lang.String">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 		<queryString>
 			<![CDATA[SELECT GL_CODE || ' / ' || GL_DESCRIPTION GL_DESC
 FROM GL_MASTER
@@ -408,7 +409,7 @@ WHERE GCM.COMPANY_POID LIKE DECODE($P{COMPANY_POID},999,'%',$P{COMPANY_POID})
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

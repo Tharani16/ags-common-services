@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.StoredProcedureQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
 
@@ -56,8 +58,11 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
                 dto.setSubmittedBy(rs.getString("SUBMITTED_BY"));
                 dto.setSubmittedByName(rs.getString("SUBMITTED_BY_NAME"));
                 dto.setDocName(rs.getString("DOC_NAME"));
+                dto.setDocShortName(getStringIfPresent(rs, "DOC_SHORT_NAME"));
+                dto.setRouteName(getStringIfPresent(rs, "ROUTE_NAME"));
+                dto.setDocRef(getStringIfPresent(rs, "DOC_REF"));
                 dto.setDocId(rs.getString("DOC_ID"));
-                dto.setDocKeyPoid(rs.getString("DOC_KEY_POID"));
+                dto.setDocKeyPoid(getDocKeyPoidAsString(rs));
                 dto.setCurrentDocStatus(rs.getString("CURRENT_DOC_STATUS"));
                 dto.setNextApproverName(rs.getString("NEXT_APPROVER_NAME"));
                 dto.setSubmitDate(rs.getTimestamp("SUBMIT_DATE"));
@@ -74,6 +79,7 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
 
     @Override
     public List<RecentDocumentDto> getRecentDocumentList(String userId, Long userPoid) {
+        log.info("Calling PROC_GLOB_RECENT_DOC_LIST for userPoid: {}", userPoid);
 
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("PROC_GLOB_RECENT_DOC_LIST");
@@ -88,8 +94,9 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
         query.execute();
 
         ResultSet rs = (ResultSet) query.getOutputParameterValue("P_REC_DOC_OUTDATA");
-
-        return mapResultSetForRecentDocument(rs);
+        List<RecentDocumentDto> result = mapResultSetForRecentDocument(rs);
+        log.info("PROC_GLOB_RECENT_DOC_LIST returned {} records", result.size());
+        return result;
     }
 
     private List<RecentDocumentDto> mapResultSetForRecentDocument(ResultSet rs) {
@@ -100,6 +107,15 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
                 RecentDocumentDto dto = new RecentDocumentDto();
 
                 dto.setDocType(rs.getString("DOC_TYPE"));
+                String shortName = getStringIfPresent(rs, "DOC_SHORT_NAME");
+                if (shortName == null || shortName.isBlank()) {
+                    shortName = rs.getString("DOC_TYPE");
+                }
+                dto.setDocShortName(shortName);
+                dto.setDocName(getStringIfPresent(rs, "DOC_NAME"));
+                dto.setRouteName(getStringIfPresent(rs, "ROUTE_NAME"));
+                dto.setDocId(getStringIfPresent(rs, "DOC_ID"));
+                dto.setDocKeyPoid(getDocKeyPoidAsString(rs));
                 dto.setDocDate(rs.getString("DOC_DATE"));
                 dto.setDocRef(rs.getString("DOC_REF"));
 
@@ -166,6 +182,8 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
             Date fromDate,
             Date toDate
     ) {
+        log.info("Calling PROC_GLOB_APPROVAL_PENDING_V2 with params - userPoid: {}, status: {}, fromDate: {}, toDate: {}", 
+                userPoid, status, fromDate, toDate);
 
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("PROC_GLOB_APPROVAL_PENDING_V2");
@@ -185,31 +203,76 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
 
         ResultSet rs = (ResultSet) query.getOutputParameterValue("OUTDATA");
 
-        return mapResultSetForApproval(rs);
+        List<ApprovalPendingDto> result = mapResultSetForApproval(rs);
+        log.info("PROC_GLOB_APPROVAL_PENDING_V2 returned {} records", result.size());
+        
+        return result;
     }
 
     private List<ApprovalPendingDto> mapResultSetForApproval(ResultSet rs) {
         List<ApprovalPendingDto> list = new ArrayList<>();
 
         try {
+            int rowCount = 0;
             while (rs.next()) {
-
+                rowCount++;
                 ApprovalPendingDto dto = new ApprovalPendingDto();
 
-                dto.setDocKeyPoid(rs.getString("DOC_KEY_POID"));
+                long docKey = rs.getLong("DOC_KEY_POID");
+                dto.setDocKeyPoid(rs.wasNull() ? null : docKey);
                 dto.setDocId(rs.getString("DOC_ID"));
                 dto.setDocName(rs.getString("DOC_NAME"));
+                dto.setDocShortName(getStringIfPresent(rs, "DOC_SHORT_NAME"));
+                dto.setRouteName(getStringIfPresent(rs, "ROUTE_NAME"));
+                dto.setDocRef(getStringIfPresent(rs, "DOC_REF"));
                 dto.setActionType(rs.getString("ACTION_TYPE"));
-                dto.setActionedDatetime(rs.getTimestamp("ACTIONED_DATETIME"));
+                dto.setDocDate(rs.getDate("DOC_DATE"));
+                
+                java.sql.Timestamp timestamp = rs.getTimestamp("ACTIONED_DATETIME");
+                if (timestamp != null) {
+                    dto.setActionedDatetime(timestamp.toLocalDateTime());
+                }
 
                 list.add(dto);
+                
+                if (rowCount <= 5) {
+                    log.debug("Row {}: docKeyPoid={}, docId={}, docName={}, actionType={}, actionedDatetime={}",
+                            rowCount, dto.getDocKeyPoid(), dto.getDocId(), dto.getDocName(), 
+                            dto.getActionType(), dto.getActionedDatetime());
+                }
             }
+            log.info("Total rows mapped from ResultSet: {}", rowCount);
 
         } catch (SQLException e) {
+            log.error("Error mapping approval pending list", e);
             throw new RuntimeException("Error mapping approval pending list", e);
         }
 
         return list;
+    }
+
+    private String getStringIfPresent(ResultSet rs, String column) throws SQLException {
+        try {
+            return rs.getString(column);
+        } catch (SQLException e) {
+            // Column may not exist yet in the stored procedure output (backward compatible fallback).
+            return null;
+        }
+    }
+
+    /**
+     * Reads DOC_KEY_POID whether the driver returns NUMBER or STRING (Oracle / ref cursor).
+     */
+    private String getDocKeyPoidAsString(ResultSet rs) throws SQLException {
+        try {
+            Object v = rs.getObject("DOC_KEY_POID");
+            if (v == null) {
+                return null;
+            }
+            return v.toString();
+        } catch (SQLException e) {
+            return null;
+        }
     }
 
     @Override

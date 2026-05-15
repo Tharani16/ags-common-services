@@ -137,7 +137,8 @@ public class AttachmentServiceImpl implements AttachmentService {
                 existingFileNames.add(originalName);
                 
                 // Log attachment upload
-                loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_UPLOADED, docId, docKeyPoid.toString());
+                String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENTS_UPLOADED.getDescription(), originalName);
+                loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
 
             } catch (Exception ex) {
                 log.error("Upload failed for {}: {}", file.getOriginalFilename(), ex.getMessage(), ex);
@@ -250,10 +251,14 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new ResourceNotFoundException("Attachment", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid + ", fileNameMapped=" + fileNameMapped);
         }
 
+        // Get filename before deletion
+        String originalFileName = attachment.get().getFileName();
+        
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, fileNameMapped);
         
         // Log attachment deletion
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DELETED, docId, docKeyPoid.toString());
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_DELETED.getDescription(), originalFileName);
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
     }
 
     @Override
@@ -267,7 +272,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new ResourceNotFoundException("Attachments", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid);
         }
         attachmentRepository.deleteAttachment(getGroupPoid(), 1L, docId, docKeyPoid, "(ALL)");
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENTS_DELETED, docId, docKeyPoid.toString());
+        String logDetail = LogDetailsEnum.ATTACHMENTS_DELETED.getDescription();
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
     }
 
     @Override
@@ -277,13 +283,14 @@ public class AttachmentServiceImpl implements AttachmentService {
         
         // Get original filename before archiving
         AttachmentDto attachmentInfo = getAttachmentInfoForArchive(docId, docKeyPoid, fileNameMapped);
-        String originalFileName = attachmentInfo.getOriginalFileName();
+        String originalFileName = stripTimestampPrefixes(attachmentInfo.getOriginalFileName());
         
         // Call existing archive procedure
         attachmentRepository.archiveAttachment(getGroupPoid(), 1L, docId, docKeyPoid, fileNameMapped);
         
         // Log attachment archiving
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_ARCHIVED, docId, docKeyPoid.toString());
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_ARCHIVED.getDescription(), originalFileName);
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
         
         // Generate archived filename with timestamp (format: ddMMyyyyHHmm_originalname)
         String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyyHHmm"));
@@ -308,6 +315,10 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
         // Update active flag from N to Y
         attachmentRepository.activateAttachment(docId, docKeyPoid, fileNameMapped);
+
+        // Log attachment unarchive/activation
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_UNARCHIVED.getDescription(), stripTimestampPrefixes(attachment.getFileName()));
+        loggingService.createLogSummaryEntry(docId, docKeyPoid.toString(), logDetail);
     }
 
     // BULK UPDATE
@@ -423,38 +434,28 @@ public class AttachmentServiceImpl implements AttachmentService {
     public Resource downloadAttachment(String docId, Long docKeyPoid, String fileNameMapped) {
         validateDoc(docId, docKeyPoid);
 
-        // Get attachment from database
         Attachment attachment = attachmentRepository
                 .findByDocIdAndDocKeyPoidAndFileNameMappedForArchive(docId, docKeyPoid, fileNameMapped)
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment", "fileNameMapped", fileNameMapped));
 
-        // Resolve attachments path based on document type
         String attachmentsPath = resolveAttachmentsPath(docId);
         if (attachmentsPath == null || attachmentsPath.trim().isEmpty()) {
             throw new AsgException("AttachmentsPath is missing for login company", 500);
         }
 
-        // Check if fileNameMapped already has extension
         String mappedFileName = attachment.getFileNameMapped();
         File file;
         
         if (mappedFileName.contains(".")) {
-            // Already has extension, use as-is
             file = new File(attachmentsPath, mappedFileName);
         } else {
-            // No extension, add it from original filename (like upload method does)
             String extension = FilenameUtils.getExtension(attachment.getFileName());
             file = new File(attachmentsPath, mappedFileName + "." + extension);
         }
         
-
-        
         if (!file.exists() || !file.canRead()) {
             throw new ResourceNotFoundException("File not found on server", "path", file.getAbsolutePath());
         }
-        
-        // Log attachment download
-        // loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_DOWNLOADED, docId, docKeyPoid.toString());
 
         return new FileSystemResource(file);
     }
@@ -465,9 +466,10 @@ public class AttachmentServiceImpl implements AttachmentService {
         Attachment a = attachmentRepository
                 .findByDocIdAndDocKeyPoidAndFileNameMappedForArchive(docId, docKeyPoid, fileNameMapped)
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment", "fileNameMapped", fileNameMapped));
+        String logDetail = String.format("%s File: %s", LogDetailsEnum.ATTACHMENT_VIEWED.getDescription(), a.getFileName());
 
-        // Log attachment viewed
-        loggingService.createLogSummaryEntry(LogDetailsEnum.ATTACHMENT_VIEWED, docId, docKeyPoid.toString());
+        // Log attachment viewed/downloaded
+        loggingService.createLogSummaryEntry( docId, docKeyPoid.toString(), logDetail);
 
         return mapRowToDto(new Object[]{
                 a.getGroupPoid(), a.getCompanyPoid(), a.getDocId(),
@@ -655,6 +657,16 @@ public class AttachmentServiceImpl implements AttachmentService {
     private String callEdiProc(Long groupPoid, Long companyPoid, String docId, Long docKeyPoid, Long ediJobPoid, String loginUser) {
         // Placeholder for actual logic
         return "SUCCESS";
+    }
+
+    /** Strips all leading ddMMyyyyHHmm_ timestamp prefixes from a filename. */
+    private String stripTimestampPrefixes(String fileName) {
+        if (fileName == null) return null;
+        // Pattern: 12 digits followed by underscore (ddMMyyyyHHmm_)
+        while (fileName.matches("^\\d{12}_.*")) {
+            fileName = fileName.substring(13);
+        }
+        return fileName;
     }
 
     @Override

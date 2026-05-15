@@ -9,4 +9,5 @@ public class CurrencyRateResponseDto {
 
     private String currencyCode;
     private Double rate;
+    private Integer currencyDecimals;
 }

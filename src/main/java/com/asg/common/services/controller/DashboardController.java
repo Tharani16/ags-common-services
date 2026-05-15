@@ -5,17 +5,12 @@ import com.asg.common.services.dto.*;
 import com.asg.common.services.service.impl.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -47,9 +42,8 @@ public class DashboardController {
 
 
     /**
-     * Retrieves a list of pending approvals based on the provided criteria in the request body.
-     *
-     * @param dto The dashboard DTO containing group, company, and user information
+     * Retrieves a list of pending approvals for the logged-in user (from `UserContext`).
+     * This endpoint does not take a request body.
      * @return ResponseEntity containing the list of pending approvals or an error message
      *
      * @apiNote This endpoint requires valid authentication and proper authorization
@@ -58,14 +52,51 @@ public class DashboardController {
      */
     @Operation(
             summary = "Get pending approvals",
-            description = "Retrieves a list of pending approval items based on the provided criteria in the request body",
+            description = "Retrieves a list of pending approval items for the logged-in user (from `UserContext`). No request body is required.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Successfully retrieved pending approvals",
                             content = @Content(
                                     mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = PendingApprovalsDto.class))
+                                    schema = @Schema(example = """
+                                            {
+                                              "success": true,
+                                              "message": "Pending approvals retrieved successfully",
+                                              "statusCode": 200,
+                                              "result": {
+                                                "data": {
+                                                  "PendingApprovals": [
+                                                    {
+                                                      "id": 1,
+                                                      "companyPoid": 1,
+                                                      "groupPoid": 1,
+                                                      "docId": "200-101",
+                                                      "docName": "Purchase Order",
+                                                      "docShortName": "PO",
+                                                      "routeName": "/procurement/po",
+                                                      "docKeyPoid": 90222,
+                                                      "docRef": "ASG14100",
+                                                      "docDate": null,
+                                                      "docSummaryInfo": "DOC REF : ASG14100  /  SUPPLIER NAME : test1211  /  REMARKS :   ",
+                                                      "userId": "HEXAUSER2",
+                                                      "userRolePoid": 126,
+                                                      "userPoid": 0,
+                                                      "actionStatus": "SUBMIT_FOR_APPROVAL",
+                                                      "actionedBy": "4894",
+                                                      "userName": "HEXAUSER2",
+                                                      "datetime": "2026-03-25T05:05:42.642+00:00",
+                                                      "comments": null
+                                                    }
+                                                  ],
+                                                  "totalElements": 1,
+                                                  "totalPages": 1,
+                                                  "pageNumber": 0,
+                                                  "pageSize": 1
+                                                }
+                                              }
+                                            }
+                                            """)
                             )
                     ),
                     @ApiResponse(
@@ -95,30 +126,15 @@ public class DashboardController {
 
 
     @PostMapping("/pending-approvals")
-    public ResponseEntity<?> getPendingApprovals(
-            @ParameterObject Pageable pageable,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Dashboard request object containing group, company, and user information",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = DashboardDto.class),
-                            examples = @ExampleObject(
-                                    name = "DashboardRequest",
-                                    value = "{\"groupPoid\": 1, \"companyPoid\": 1, \"userPoid\": 1902}",
-                                    summary = "Example dashboard request"
-                            )
-                    )
-            )
-            @Valid @RequestBody DashboardDto dto) {
+    public ResponseEntity<?> getPendingApprovals() {
         try {
-            PendingApprovalResponse pendingApprovals = dashboardService.getDashboardEntity(dto.getGroupPoid(), dto.getCompanyPoid(), dto.getUserPoid(),pageable);
+            PendingApprovalResponse pendingApprovals = dashboardService.getDashboardEntity();
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("PendingApprovals", pendingApprovals.getPendingApprovals());
-            responseData.put("pageNumber", pageable.getPageNumber());
-            responseData.put("pageSize", pageable.getPageSize());
             responseData.put("totalElements", pendingApprovals.getTotalElements());
             responseData.put("totalPages",pendingApprovals.getTotalPages());
+            responseData.put("pageNumber", pendingApprovals.getPageNumber());
+            responseData.put("pageSize", pendingApprovals.getPageSize());
             return success("Pending approvals retrieved successfully", responseData);
         } catch (Exception e) {
             log.error("Error while fetching pending approvals", e);
@@ -133,7 +149,34 @@ public class DashboardController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Successfully retrieved user submit status",
-                            content = @Content(mediaType = "application/json")
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(example = """
+                                            {
+                                              "success": true,
+                                              "message": "User submit status retrieved successfully",
+                                              "statusCode": 200,
+                                              "result": {
+                                                "data": [
+                                                  {
+                                                    "submittedBy": "4894",
+                                                    "submittedByName": "John Doe",
+                                                    "docName": "Purchase Order",
+                                                    "docShortName": "PO",
+                                                    "routeName": "/procurement/po",
+                                                    "docRef": "ASG14100",
+                                                    "docId": "200-101",
+                                                    "docKeyPoid": "90222",
+                                                    "currentDocStatus": "PENDING",
+                                                    "nextApproverName": "Manager",
+                                                    "submitDate": "2026-03-25T05:05:42.642+00:00",
+                                                    "status": "PENDING"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                            """)
+                            )
                     ),
                     @ApiResponse(
                             responseCode = "400",
@@ -154,11 +197,7 @@ public class DashboardController {
             tags = {"Dashboard"}
     )
     @GetMapping("/submit-status")
-    public List<UserApprovalSubmitStatusDto> getUserApprovalSubmitStatus(
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested,
+    public ResponseEntity<?> getUserApprovalSubmitStatus(
             @Parameter(description = "Status filter: ALL/APPROVED/PENDING", example = "ALL")
             @RequestParam(required = false, defaultValue = "ALL") String status,
             @Parameter(description = "Start date for filtering submissions", example = "2025-11-01")
@@ -168,12 +207,13 @@ public class DashboardController {
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
     ) {
-        return dashboardService.fetchUserSubmitStatus(
+        List<UserApprovalSubmitStatusDto> result = dashboardService.fetchUserSubmitStatus(
                 String.valueOf(UserContext.getUserPoid()),
                 status,
                 fromDate,
                 toDate
         );
+        return success("User submit status retrieved successfully", result);
     }
 
     @Operation(
@@ -205,18 +245,37 @@ public class DashboardController {
     )
 
     @GetMapping("/recent-documents")
-    public List<RecentDocumentDto> getRecentDocuments(
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
-    ) {
+    public List<RecentDocumentDto> getRecentDocuments() {
         return dashboardService.fetchRecentDocuments(
                 UserContext.getUserId(), UserContext.getUserPoid());
     }
 
     @Operation(
-            summary = "Get favorite menu",
+            summary = "Get recent transactions",
+            description = "Retrieves current week's recent transactions for the logged-in user, sorted by latest, limited to top 15. Each item includes docId, docKeyPoid, docName, docShortName, routeName, docRef, docType, docDate.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved recent transactions",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            },
+            tags = {"Dashboard"}
+    )
+    @GetMapping("/recent-transactions")
+    public ResponseEntity<?> getRecentTransactions() {
+        try {
+            List<RecentDocumentDto> result = dashboardService.fetchRecentTransactions(
+                    UserContext.getUserId(), UserContext.getUserPoid());
+            return success("Recent transactions retrieved successfully", result);
+        } catch (Exception e) {
+            log.error("Error while fetching recent transactions", e);
+            throw new RuntimeException("Error retrieving recent transactions: " + e.getMessage(), e);
+        }
+    }
+
+    @Operation(
             description = "Retrieves user's favorite menu items based on the provided criteria",
             responses = {
                     @ApiResponse(
@@ -244,23 +303,18 @@ public class DashboardController {
     )
 
     @GetMapping("/favorite-menu")
-    public List<FavoriteMenuDto> getFavoriteMenu(
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
-    ) {
+    public List<FavoriteMenuDto> getFavoriteMenu() {
         return dashboardService.fetchFavoriteMenu(
                 UserContext.getUserId(), UserContext.getUserPoid());
     }
 
     @Operation(
-            summary = "Get approval pending list",
-            description = "Retrieves list of items pending for approval based on the provided criteria",
+            summary = "Get dashboard approvals",
+            description = "Retrieves approval dashboard data with support for Pending and Completed tabs",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Successfully retrieved approval pending list",
+                            description = "Successfully retrieved approvals",
                             content = @Content(mediaType = "application/json")
                     ),
                     @ApiResponse(
@@ -281,25 +335,22 @@ public class DashboardController {
             },
             tags = {"Dashboard"}
     )
-
-    @GetMapping("/approval-pending-list")
-    public List<ApprovalPendingDto> getApprovalPendingList(
-            @Parameter(description = "Approval status filter (ALL, APPROVED, PENDING)", required = false)
+    @GetMapping("/approvals")
+    public ResponseEntity<?> getApprovals(
+            @Parameter(description = "Approval status filter: PENDING (Pending tab) / APPROVED (Completed tab) / ALL", required = false, example = "PENDING")
             @RequestParam(required = false, defaultValue = "ALL") String status,
             @Parameter(description = "Start date of the range", required = true, example = "2025-01-01")
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
             @Parameter(description = "End date of the range", required = true, example = "2025-12-31")
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate,
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
     ) {
-        return dashboardService.fetchApprovalPendingList(
+        List<ApprovalPendingDto> approvals = dashboardService.fetchApprovalPendingList(
                 String.valueOf(UserContext.getUserPoid()),
                 status,
                 fromDate,
-                toDate);
+                toDate
+        );
+        return success("Approvals retrieved successfully", approvals);
     }
 
     @Operation(
@@ -331,19 +382,16 @@ public class DashboardController {
     )
 
     @GetMapping("/weekly-transactions")
-    public List<WeeklyTransactionDto> getWeeklyTransactions(
-            @Parameter(description = "Start period of the week (format: yyyy-MM-dd)", required = true, example = "2025-11-01")
-            @RequestParam String periodFrom,
-            @Parameter(description = "End period of the week (format: yyyy-MM-dd)", required = true, example = "2025-11-07")
-            @RequestParam String periodTo,
-            @Parameter(description = "Document identifier", required = true, example = "800-320")
-            @RequestParam String documentId,
-            @Parameter(description = "Action requested", required = true)
-            @RequestParam String actionRequested
-    ) {
-        return dashboardService.fetchWeeklyTransactions(
-                String.valueOf(UserContext.getUserPoid()),
-                periodFrom,
-                periodTo);
+    public ResponseEntity<?> getWeeklyTransactions() {
+        try {
+            List<WeeklyTransactionDto> result = dashboardService.fetchWeeklyTransactions(
+                    String.valueOf(UserContext.getUserPoid()));
+
+            return success("Weekly transactions retrieved successfully", result);
+
+        } catch (Exception e) {
+            log.error("Error while fetching weekly transactions", e);
+            throw new RuntimeException("Error retrieving weekly transactions: " + e.getMessage(), e);
+        }
     }
 }

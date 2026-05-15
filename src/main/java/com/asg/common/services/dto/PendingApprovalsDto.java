@@ -11,7 +11,9 @@ public class PendingApprovalsDto {
     private Long companyPoid;
     private Long groupPoid;
     private String docId;
+    private String docName;
     private String docShortName;
+    private String routeName;
     private Long docKeyPoid;
     private String docRef;
     private Date docDate;

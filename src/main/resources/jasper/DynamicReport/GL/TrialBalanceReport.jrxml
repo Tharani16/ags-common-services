@@ -55,6 +55,7 @@
 	</parameter>
 	<parameter name="SUBREPORT1" class="net.sf.jasperreports.engine.JasperReport"/>
 	<parameter name="LEVEL_LIMIT" class="java.lang.String"/>
+	<parameter name="REPORT_DATE" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT DISTINCT COMPANY_NAME
 FROM(
@@ -146,7 +147,7 @@ WHERE GCM.COMPANY_POID LIKE DECODE($P{COMPANY_POID},999,'%',$P{COMPANY_POID})
 				<textElement>
 					<font size="8" isBold="true" pdfFontName="Helvetica-Bold"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_DATE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement style="style1" x="670" y="0" width="100" height="20" forecolor="#666666" uuid="d1302037-9652-4932-80c3-2fd02a99f804"/>
