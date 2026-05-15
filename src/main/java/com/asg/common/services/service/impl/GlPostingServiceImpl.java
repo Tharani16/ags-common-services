@@ -5,7 +5,7 @@ import com.asg.common.lib.dto.response.GlPostingViewResponseDto;
 import com.asg.common.lib.service.ApprovalService;
 import com.asg.common.services.repository.GlPostingRepository;
 import com.asg.common.services.service.GlPostingService;
-import com.asg.common.lib.repository.DocumentRepository;
+import com.asg.common.lib.repository.DocumentCommonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ public class GlPostingServiceImpl implements GlPostingService {
 
     private final GlPostingRepository repository;
     private final ApprovalService approvalService;
-    private final DocumentRepository documentRepository;
+    private final DocumentCommonRepository documentRepository;
 
     @Override
     public GlPostingViewResponseDto fetchGlPostings(String docId, Long transactionPoid) throws SQLException {
