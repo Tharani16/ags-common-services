@@ -2,7 +2,6 @@ package com.asg.common.services.service;
 
 import com.asg.common.lib.service.PrintService;
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperReport;
 import oracle.jdbc.driver.OracleConnection;
 import oracle.sql.ARRAY;
@@ -29,7 +28,7 @@ public class DynamicReportPrintService {
     @Value("${db.connection:oracle}")
     private String dbConnection;
 
-    private JasperReport load(String path) throws JRException {
+    private JasperReport load(String path) throws Exception {
         return printService.load("postgres".equalsIgnoreCase(dbConnection) ? "PG/" + path : path);
     }
 
@@ -144,7 +143,8 @@ public class DynamicReportPrintService {
                 params.put("SUBREPORT1", load("DynamicReport/RevenueReports/OverAllGLLedgerDivisionWiseSubreport.jrxml"));
                 yield load("DynamicReport/RevenueReports/OverAllGLLedgerDivisionWiseReport.jrxml");
             }
-            case "400-375", "400-377", "400-378", "400-379", "400-380", "400-381", "400-382", "400-384", "400-385", "400-386", "400-387", "400-388", "400-392" -> {
+            case "400-375", "400-377", "400-378", "400-379", "400-380", "400-381", "400-382", "400-384", "400-385",
+                 "400-386", "400-387", "400-388", "400-392" -> {
                 params.put("SUBREPORT1", load("DynamicReport/GL/TrialBalanceReportSubreport1.jrxml"));
                 yield load("DynamicReport/GL/TrialBalanceReport.jrxml");
             }
@@ -174,4 +174,5 @@ public class DynamicReportPrintService {
             case "800-219" -> load("DynamicReport/HR/HrProvisionsTillDateRpt.jrxml");
             default -> load("DynamicReport/DynamicReport_A3.jrxml");
         };
+      }
     }
