@@ -38,7 +38,7 @@
 		<parameter name="EXCLUDE_OPENING" class="java.lang.String"/>
 		<!-- CHANGE: language changed from plsql to sql; SP call updated for PostgreSQL -->
 		<queryString language="sql">
-			<![CDATA[{call production.proc_gl_ledger_trial_bal_rpt( $P{PERIOD_DATE}::date, $P{PERIOD_DATE2}::date, ARRAY[$P{COMPANY_POID}::numeric], $P{LEVEL_LIMIT}, $P{EXCLUDE_OPENING} )}]]>
+			<![CDATA[{call proc_gl_ledger_trial_bal_rpt( $P{PERIOD_DATE}::date, $P{PERIOD_DATE2}::date, ARRAY[$P{COMPANY_POID}::numeric], $P{LEVEL_LIMIT}, $P{EXCLUDE_OPENING} )}]]>
 		</queryString>
 		<field name="GL_POID" class="java.lang.String"/>
 		<field name="FLVL" class="java.math.BigDecimal"/>
@@ -69,7 +69,7 @@
         CASE WHEN $P{COMPANY_POID} = '999' THEN 'All Companies'
              ELSE GCM.COMPANY_NAME
         END AS COMPANY_NAME
-    FROM production.GLOBAL_COMPANY_MASTER GCM
+    FROM GLOBAL_COMPANY_MASTER GCM
     WHERE CAST($P{COMPANY_POID} AS INTEGER) = 999
        OR GCM.COMPANY_POID = CAST($P{COMPANY_POID} AS INTEGER)
 ) as subquery]]>

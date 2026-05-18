@@ -158,13 +158,13 @@
 	<parameter name="LEVEL_LIMIT" class="java.lang.String"/>
 	<parameter name="EXCLUDE_OPENING" class="java.lang.String"/>
 	<!-- CHANGE: language changed from plsql to sql; SP updated for PostgreSQL:
-         - Added schema prefix: production.
+         - Added schema prefix: 
          - PERIOD_DATE & PERIOD_DATE2 cast to ::date
          - COMPANY_POID wrapped as ARRAY[...::numeric] (Oracle: single number, PostgreSQL: multiselect array)
          - EXCLUDE_OPENING now explicitly passed
          - $P{ORACLE_REF_CURSOR} removed (PostgreSQL handles refcursor internally) -->
 	<queryString language="sql">
-		<![CDATA[{call production.proc_gl_ledger_trial_bal_rpt( $P{PERIOD_DATE}::date, $P{PERIOD_DATE2}::date, ARRAY[$P{COMPANY_POID}::numeric], $P{LEVEL_LIMIT}, $P{EXCLUDE_OPENING} )}]]>
+		<![CDATA[{call proc_gl_ledger_trial_bal_rpt( $P{PERIOD_DATE}::date, $P{PERIOD_DATE2}::date, ARRAY[$P{COMPANY_POID}::numeric], $P{LEVEL_LIMIT}, $P{EXCLUDE_OPENING} )}]]>
 	</queryString>
 	<field name="GL_POID" class="java.math.BigDecimal"/>
 	<field name="FLVL" class="java.math.BigDecimal"/>
