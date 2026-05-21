@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Repository
@@ -23,31 +21,6 @@ public class DocumentLockRepository {
 
     @Autowired
     private final DataSource dataSource;
-
-    // DELETE permission (index 3) in RIGHTS string maps to "Release Edit Lock"
-    private static final int RELEASE_LOCK_RIGHTS_INDEX = 3;
-
-    public boolean hasReleaseLockPermission(String loginUserPoid, String docId) {
-        String sql = """
-                SELECT NVL(MAX(SUBSTR(NVL(RD.RIGHTS,'000000'), ?, 1)), '0')
-                FROM GLOBAL_USER_ROLES_RIGHTS_DTL RD
-                INNER JOIN GLOBAL_USERS_AUTH_ROLES_DTL UR ON UR.USER_ROLE_POID = RD.USER_ROLE_POID
-                  AND (UR.EXPIRY_DATE IS NULL OR UR.EXPIRY_DATE >= TRUNC(SYSDATE))
-                WHERE UR.USER_POID = ? AND RD.DOC_ID = ?
-                """;
-        try (Connection connection = DataSourceUtils.getConnection(dataSource);
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, RELEASE_LOCK_RIGHTS_INDEX + 1); // Oracle SUBSTR is 1-based
-            ps.setLong(2, Long.parseLong(loginUserPoid));
-            ps.setString(3, docId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() && "1".equals(rs.getString(1));
-            }
-        } catch (SQLException e) {
-            log.error("Error checking release lock permission: {}", e.getMessage(), e);
-            return false;
-        }
-    }
 
     public String releaseLock(DocReleaseLockRequestDto request) {
         log.info("Releasing lock -> loginGroupPoid: {}, loginCompanyPoid: {}, loginUserPoid: {}, docId: {}, docPoidValue: {}, userId: {}",
