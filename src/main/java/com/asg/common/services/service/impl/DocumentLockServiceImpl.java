@@ -29,11 +29,6 @@ public class DocumentLockServiceImpl implements DocumentLockService {
     }
 
     @Override
-    public boolean hasReleaseLockPermission(String loginUserPoid, String docId) {
-        return documentLockRepository.hasReleaseLockPermission(loginUserPoid, docId);
-    }
-
-    @Override
     public String updateLock(DocUpdateLockRequestDto request) {
 
         return documentLockRepository.updateLock(request);
