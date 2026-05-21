@@ -12,6 +12,4 @@ public interface DocumentLockService {
     String releaseLock(DocReleaseLockRequestDto request);
 
     String updateLock(DocUpdateLockRequestDto request);
-
-    boolean hasReleaseLockPermission(String loginUserPoid, String docId);
 }
