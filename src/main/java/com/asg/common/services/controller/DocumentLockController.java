@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.asg.common.lib.dto.response.ApiResponse.*;
 
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -87,10 +88,10 @@ public class DocumentLockController {
     public ResponseEntity<?> releaseLock(
             @Parameter(description = "Release lock request payload", required = true)
             @Valid @RequestBody DocReleaseLockRequestDto request
+
+
     ) {
-        if (!documentLockService.hasReleaseLockPermission(request.getLoginUserPoid(), request.getDocId())) {
-            return error("You do not have permission to release the edit lock", 403);
-        }
+
         String status = documentLockService.releaseLock(request);
         return success("Lock released successfully", status);
     }
