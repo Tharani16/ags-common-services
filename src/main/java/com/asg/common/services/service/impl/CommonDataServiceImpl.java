@@ -30,6 +30,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -80,8 +82,13 @@ public class CommonDataServiceImpl implements CommonDataService {
 
         Double taxPercentage = taxMaster.getPercentage();
 
-        Double taxAmt = (drAmt * taxPercentage) / 100.0;
-        Double totalAmt = drAmt + taxAmt;
+        Double taxAmt = BigDecimal.valueOf((drAmt * taxPercentage) / 100.0)
+                .setScale(3, RoundingMode.HALF_UP)
+                .doubleValue();
+
+        Double totalAmt = BigDecimal.valueOf(drAmt + taxAmt)
+                .setScale(3, RoundingMode.HALF_UP)
+                .doubleValue();
 
         return TaxCalculationResponseDto.builder()
                 .drAmt(drAmt)
