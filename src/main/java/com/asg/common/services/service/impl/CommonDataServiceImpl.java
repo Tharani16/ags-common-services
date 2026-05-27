@@ -383,11 +383,12 @@ public class CommonDataServiceImpl implements CommonDataService {
 
     @Override
     public AddressDetailsListResponseDto fetchAddressByMasterPoid(
-            Long addressMasterPoid
+            Long addressMasterPoid,
+            Long addressPoid
     ) {
-        // Input validation
-        if (addressMasterPoid == null) {
-            throw new ValidationException("Address Master POID is required");
+        // At least one identifier must be supplied
+        if (addressMasterPoid == null && addressPoid == null) {
+            throw new ValidationException("Either Address Master POID or Address POID must be provided");
         }
 
         StoredProcedureQuery query = entityManager
@@ -397,8 +398,9 @@ public class CommonDataServiceImpl implements CommonDataService {
         query.registerStoredProcedureParameter("P_ADDRESS_POID", Long.class, jakarta.persistence.ParameterMode.IN);
         query.registerStoredProcedureParameter("OUTDATA", void.class, jakarta.persistence.ParameterMode.REF_CURSOR);
 
+        // addressMasterPoid takes priority; fall back to addressPoid
         query.setParameter("P_ADDRESS_MASTER_POID", addressMasterPoid);
-        query.setParameter("P_ADDRESS_POID", null);
+        query.setParameter("P_ADDRESS_POID", addressMasterPoid != null ? null : addressPoid);
 
         try {
             query.execute();
@@ -407,16 +409,19 @@ public class CommonDataServiceImpl implements CommonDataService {
         }
 
         Object cursor = query.getOutputParameterValue("OUTDATA");
-        
+
         if (cursor == null) {
             throw new RuntimeException("No data returned from address details procedure");
         }
-        
+
         List<AddressDetailsResponseDto> addressDetailsList = mapAddressCursorToList(cursor);
-        
+
         // Check if any address details were found
         if (addressDetailsList.isEmpty()) {
-            throw new ValidationException("No address details found for Address Master POID: " + addressMasterPoid);
+            String identifier = addressMasterPoid != null
+                    ? "Address Master POID: " + addressMasterPoid
+                    : "Address POID: " + addressPoid;
+            throw new ValidationException("No address details found for " + identifier);
         }
 
         return new AddressDetailsListResponseDto(addressDetailsList);

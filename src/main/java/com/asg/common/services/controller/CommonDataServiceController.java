@@ -297,15 +297,16 @@ public class CommonDataServiceController {
     }
 
     @Operation(
-            summary = "Fetch Address Details by Master POID",
-            description = "Fetches complete address details using address master POID via PROC_ADDRESS_GET_DETAILS_ALL procedure.",
+            summary = "Fetch Address Details by Master POID or Address POID",
+            description = "Fetches complete address details using either addressMasterPoid or addressPoid via PROC_ADDRESS_GET_DETAILS_ALL procedure. " +
+                    "At least one of the two parameters must be supplied. When both are provided, addressMasterPoid takes priority.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Address details fetched successfully",
                             content = @Content(schema = @Schema(implementation = AddressDetailsListResponseDto.class))
                     ),
-                    @ApiResponse(responseCode = "400", description = "Invalid input provided"),
+                    @ApiResponse(responseCode = "400", description = "Neither addressMasterPoid nor addressPoid was provided"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access"),
                     @ApiResponse(responseCode = "404", description = "Address record not found")
             },
@@ -313,10 +314,13 @@ public class CommonDataServiceController {
     )
     @GetMapping("/fetch-address-by-master-poid")
     public ResponseEntity<?> fetchAddressByMasterPoid(
-            @Parameter(description = "Address Master POID", required = true, example = "67890")
-            @RequestParam Long addressMasterPoid
+            @Parameter(description = "Address Master POID (optional if addressPoid is provided)", required = false, example = "67890")
+            @RequestParam(required = false) Long addressMasterPoid,
+
+            @Parameter(description = "Address POID (optional if addressMasterPoid is provided)", required = false, example = "12345")
+            @RequestParam(required = false) Long addressPoid
     ) {
-        AddressDetailsListResponseDto response = glMasterService.fetchAddressByMasterPoid(addressMasterPoid);
+        AddressDetailsListResponseDto response = glMasterService.fetchAddressByMasterPoid(addressMasterPoid, addressPoid);
         return success("Address details fetched successfully", response);
     }
 

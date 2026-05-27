@@ -66,7 +66,8 @@ public interface CommonDataService {
     );
 
     AddressDetailsListResponseDto fetchAddressByMasterPoid(
-            Long addressMasterPoid
+            Long addressMasterPoid,
+            Long addressPoid
     );
 
 }
