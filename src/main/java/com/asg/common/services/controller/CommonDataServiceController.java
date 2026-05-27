@@ -8,6 +8,7 @@ import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
 import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.*;
 import com.asg.common.services.service.CommonDataService;
+import com.asg.common.lib.exception.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.asg.common.lib.dto.response.ApiResponse.success;
@@ -297,15 +299,16 @@ public class CommonDataServiceController {
     }
 
     @Operation(
-            summary = "Fetch Address Details by Master POID",
-            description = "Fetches complete address details using address master POID via PROC_ADDRESS_GET_DETAILS_ALL procedure.",
+            summary = "Fetch Address Details by Master POID or Address POID",
+            description = "Fetches complete address details using either addressMasterPoid or addressPoid via PROC_ADDRESS_GET_DETAILS_ALL procedure. " +
+                    "At least one of the two parameters must be supplied. When both are provided, addressPoid takes priority.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Address details fetched successfully",
                             content = @Content(schema = @Schema(implementation = AddressDetailsListResponseDto.class))
                     ),
-                    @ApiResponse(responseCode = "400", description = "Invalid input provided"),
+                    @ApiResponse(responseCode = "400", description = "Neither addressMasterPoid nor addressPoid was provided"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized access"),
                     @ApiResponse(responseCode = "404", description = "Address record not found")
             },
@@ -313,10 +316,22 @@ public class CommonDataServiceController {
     )
     @GetMapping("/fetch-address-by-master-poid")
     public ResponseEntity<?> fetchAddressByMasterPoid(
-            @Parameter(description = "Address Master POID", required = true, example = "67890")
-            @RequestParam Long addressMasterPoid
+            @Parameter(description = "Address Master POID (optional if addressPoid is provided)", required = false, example = "67890")
+            @RequestParam(required = false) Long addressMasterPoid,
+
+            @Parameter(description = "Address POID (optional if addressMasterPoid is provided)", required = false, example = "1231.4")
+            @RequestParam(required = false) String addressPoid
     ) {
-        AddressDetailsListResponseDto response = glMasterService.fetchAddressByMasterPoid(addressMasterPoid);
+        BigDecimal parsedAddressPoid = null;
+        if (addressPoid != null) {
+            try {
+                parsedAddressPoid = new BigDecimal(addressPoid.trim());
+            } catch (NumberFormatException e) {
+                throw new ValidationException("addressPoid must be a valid number, received: " + addressPoid);
+            }
+        }
+
+        AddressDetailsListResponseDto response = glMasterService.fetchAddressByMasterPoid(addressMasterPoid, parsedAddressPoid);
         return success("Address details fetched successfully", response);
     }
 
