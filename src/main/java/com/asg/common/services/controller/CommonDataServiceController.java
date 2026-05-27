@@ -8,6 +8,7 @@ import com.asg.common.lib.dto.response.TaxCalculationResponseDto;
 import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.*;
 import com.asg.common.services.service.CommonDataService;
+import com.asg.common.lib.exception.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.asg.common.lib.dto.response.ApiResponse.success;
@@ -299,7 +301,7 @@ public class CommonDataServiceController {
     @Operation(
             summary = "Fetch Address Details by Master POID or Address POID",
             description = "Fetches complete address details using either addressMasterPoid or addressPoid via PROC_ADDRESS_GET_DETAILS_ALL procedure. " +
-                    "At least one of the two parameters must be supplied. When both are provided, addressMasterPoid takes priority.",
+                    "At least one of the two parameters must be supplied. When both are provided, addressPoid takes priority.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -317,10 +319,19 @@ public class CommonDataServiceController {
             @Parameter(description = "Address Master POID (optional if addressPoid is provided)", required = false, example = "67890")
             @RequestParam(required = false) Long addressMasterPoid,
 
-            @Parameter(description = "Address POID (optional if addressMasterPoid is provided)", required = false, example = "12345")
-            @RequestParam(required = false) Long addressPoid
+            @Parameter(description = "Address POID (optional if addressMasterPoid is provided)", required = false, example = "1231.4")
+            @RequestParam(required = false) String addressPoid
     ) {
-        AddressDetailsListResponseDto response = glMasterService.fetchAddressByMasterPoid(addressMasterPoid, addressPoid);
+        BigDecimal parsedAddressPoid = null;
+        if (addressPoid != null) {
+            try {
+                parsedAddressPoid = new BigDecimal(addressPoid.trim());
+            } catch (NumberFormatException e) {
+                throw new ValidationException("addressPoid must be a valid number, received: " + addressPoid);
+            }
+        }
+
+        AddressDetailsListResponseDto response = glMasterService.fetchAddressByMasterPoid(addressMasterPoid, parsedAddressPoid);
         return success("Address details fetched successfully", response);
     }
 

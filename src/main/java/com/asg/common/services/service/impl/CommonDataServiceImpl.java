@@ -384,7 +384,7 @@ public class CommonDataServiceImpl implements CommonDataService {
     @Override
     public AddressDetailsListResponseDto fetchAddressByMasterPoid(
             Long addressMasterPoid,
-            Long addressPoid
+            BigDecimal addressPoid
     ) {
         // At least one identifier must be supplied
         if (addressMasterPoid == null && addressPoid == null) {
@@ -395,12 +395,13 @@ public class CommonDataServiceImpl implements CommonDataService {
                 .createStoredProcedureQuery("PROC_ADDRESS_GET_DETAILS_ALL");
 
         query.registerStoredProcedureParameter("P_ADDRESS_MASTER_POID", Long.class, jakarta.persistence.ParameterMode.IN);
-        query.registerStoredProcedureParameter("P_ADDRESS_POID", Long.class, jakarta.persistence.ParameterMode.IN);
+        query.registerStoredProcedureParameter("P_ADDRESS_POID", BigDecimal.class, jakarta.persistence.ParameterMode.IN);
         query.registerStoredProcedureParameter("OUTDATA", void.class, jakarta.persistence.ParameterMode.REF_CURSOR);
 
-        // addressMasterPoid takes priority; fall back to addressPoid
+        // Pass both params as-is — the procedure checks P_ADDRESS_POID first (IF branch),
+        // then falls through to P_ADDRESS_MASTER_POID (ELSIF branch).
         query.setParameter("P_ADDRESS_MASTER_POID", addressMasterPoid);
-        query.setParameter("P_ADDRESS_POID", addressMasterPoid != null ? null : addressPoid);
+        query.setParameter("P_ADDRESS_POID", addressPoid);
 
         try {
             query.execute();
@@ -418,9 +419,9 @@ public class CommonDataServiceImpl implements CommonDataService {
 
         // Check if any address details were found
         if (addressDetailsList.isEmpty()) {
-            String identifier = addressMasterPoid != null
-                    ? "Address Master POID: " + addressMasterPoid
-                    : "Address POID: " + addressPoid;
+            String identifier = addressPoid != null
+                    ? "Address POID: " + addressPoid.toPlainString()
+                    : "Address Master POID: " + addressMasterPoid;
             throw new ValidationException("No address details found for " + identifier);
         }
 
