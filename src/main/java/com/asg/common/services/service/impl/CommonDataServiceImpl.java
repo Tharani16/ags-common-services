@@ -438,7 +438,7 @@ public class CommonDataServiceImpl implements CommonDataService {
                 AddressDetailsResponseDto address = new AddressDetailsResponseDto();
                 
                 address.setAddressMasterPoid(rs.getBigDecimal("ADDRESS_MASTER_POID") != null ? rs.getBigDecimal("ADDRESS_MASTER_POID").longValue() : null);
-                address.setAddressPoid(rs.getBigDecimal("ADDRESS_POID") != null ? rs.getBigDecimal("ADDRESS_POID").longValue() : null);
+                address.setAddressPoid(rs.getBigDecimal("ADDRESS_POID"));
                 address.setAddressName(rs.getString("ADDRESS_NAME"));
                 address.setAddressType(rs.getString("ADDRESS_TYPE"));
                 address.setOffTel1(rs.getString("OFF_TEL1"));

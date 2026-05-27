@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDetailsResponseDto {
     private Long addressMasterPoid;
-    private Long addressPoid;
+    private BigDecimal addressPoid;
     private String addressName;
     private String addressType;
     private String offTel1;
