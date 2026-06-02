@@ -30,6 +30,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -80,8 +82,13 @@ public class CommonDataServiceImpl implements CommonDataService {
 
         Double taxPercentage = taxMaster.getPercentage();
 
-        Double taxAmt = (drAmt * taxPercentage) / 100.0;
-        Double totalAmt = drAmt + taxAmt;
+        Double taxAmt = BigDecimal.valueOf((drAmt * taxPercentage) / 100.0)
+                .setScale(3, RoundingMode.HALF_UP)
+                .doubleValue();
+
+        Double totalAmt = BigDecimal.valueOf(drAmt + taxAmt)
+                .setScale(3, RoundingMode.HALF_UP)
+                .doubleValue();
 
         return TaxCalculationResponseDto.builder()
                 .drAmt(drAmt)
@@ -376,22 +383,25 @@ public class CommonDataServiceImpl implements CommonDataService {
 
     @Override
     public AddressDetailsListResponseDto fetchAddressByMasterPoid(
-            Long addressMasterPoid
+            Long addressMasterPoid,
+            BigDecimal addressPoid
     ) {
-        // Input validation
-        if (addressMasterPoid == null) {
-            throw new ValidationException("Address Master POID is required");
+        // At least one identifier must be supplied
+        if (addressMasterPoid == null && addressPoid == null) {
+            throw new ValidationException("Either Address Master POID or Address POID must be provided");
         }
 
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("PROC_ADDRESS_GET_DETAILS_ALL");
 
         query.registerStoredProcedureParameter("P_ADDRESS_MASTER_POID", Long.class, jakarta.persistence.ParameterMode.IN);
-        query.registerStoredProcedureParameter("P_ADDRESS_POID", Long.class, jakarta.persistence.ParameterMode.IN);
+        query.registerStoredProcedureParameter("P_ADDRESS_POID", BigDecimal.class, jakarta.persistence.ParameterMode.IN);
         query.registerStoredProcedureParameter("OUTDATA", void.class, jakarta.persistence.ParameterMode.REF_CURSOR);
 
+        // Pass both params as-is — the procedure checks P_ADDRESS_POID first (IF branch),
+        // then falls through to P_ADDRESS_MASTER_POID (ELSIF branch).
         query.setParameter("P_ADDRESS_MASTER_POID", addressMasterPoid);
-        query.setParameter("P_ADDRESS_POID", null);
+        query.setParameter("P_ADDRESS_POID", addressPoid);
 
         try {
             query.execute();
@@ -400,16 +410,19 @@ public class CommonDataServiceImpl implements CommonDataService {
         }
 
         Object cursor = query.getOutputParameterValue("OUTDATA");
-        
+
         if (cursor == null) {
             throw new RuntimeException("No data returned from address details procedure");
         }
-        
+
         List<AddressDetailsResponseDto> addressDetailsList = mapAddressCursorToList(cursor);
-        
+
         // Check if any address details were found
         if (addressDetailsList.isEmpty()) {
-            throw new ValidationException("No address details found for Address Master POID: " + addressMasterPoid);
+            String identifier = addressPoid != null
+                    ? "Address POID: " + addressPoid.toPlainString()
+                    : "Address Master POID: " + addressMasterPoid;
+            throw new ValidationException("No address details found for " + identifier);
         }
 
         return new AddressDetailsListResponseDto(addressDetailsList);
@@ -425,7 +438,7 @@ public class CommonDataServiceImpl implements CommonDataService {
                 AddressDetailsResponseDto address = new AddressDetailsResponseDto();
                 
                 address.setAddressMasterPoid(rs.getBigDecimal("ADDRESS_MASTER_POID") != null ? rs.getBigDecimal("ADDRESS_MASTER_POID").longValue() : null);
-                address.setAddressPoid(rs.getBigDecimal("ADDRESS_POID") != null ? rs.getBigDecimal("ADDRESS_POID").longValue() : null);
+                address.setAddressPoid(rs.getBigDecimal("ADDRESS_POID"));
                 address.setAddressName(rs.getString("ADDRESS_NAME"));
                 address.setAddressType(rs.getString("ADDRESS_TYPE"));
                 address.setOffTel1(rs.getString("OFF_TEL1"));
