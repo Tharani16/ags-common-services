@@ -10,6 +10,7 @@ import com.asg.common.services.dto.AddressDetailsListResponseDto;
 import com.asg.common.services.dto.AddressPoidResponseDto;
 import com.asg.common.services.dto.CurrencyRateResponseDto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CommonDataService {
@@ -66,7 +67,8 @@ public interface CommonDataService {
     );
 
     AddressDetailsListResponseDto fetchAddressByMasterPoid(
-            Long addressMasterPoid
+            Long addressMasterPoid,
+            BigDecimal addressPoid
     );
 
 }
