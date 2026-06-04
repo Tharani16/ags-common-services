@@ -25,6 +25,7 @@ public class DraftServiceImpl implements DraftService {
 
     @Transactional
     public Draft saveOrUpdateDraft(SaveDraftRequest req) {
+        log.info("saveOrUpdateDraft : docId={}, companyPoid={}, userPoid={}", req.getDocId(), req.getCompanyPoid(), req.getUserPoid());
         String payload = serialize(req.getJsonData());
 
         Optional<Draft> draftOptional = repository.findByDocIdAndCompanyPoidAndUserPoid(req.getDocId(), req.getCompanyPoid(), req.getUserPoid());
@@ -55,6 +56,7 @@ public class DraftServiceImpl implements DraftService {
 
     @Transactional()
     public Optional<Draft> getDraft(String docId, Long companyId, Long userId) {
+        log.info("getDraft : docId={}, companyId={}, userId={}", docId, companyId, userId);
         return repository.findByDocIdAndCompanyPoidAndUserPoid(docId, companyId, userId);
     }
 
