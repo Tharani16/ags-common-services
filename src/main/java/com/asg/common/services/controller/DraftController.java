@@ -82,6 +82,10 @@ public class DraftController {
         resp.setDocId(saved.getDocId());
         resp.setCompanyPoid(saved.getCompanyPoid());
         resp.setUserId(saved.getUserPoid());
+        log.info("Draft saved successfully. DocId: {}, CompanyPoid: {}, UserPoid: {}",
+                saved.getDocId(),
+                saved.getCompanyPoid(),
+                saved.getUserPoid());
         return success("Draft saved successfully", resp);
     }
 
@@ -102,6 +106,7 @@ public class DraftController {
             @PathVariable @NotNull Long companyPoid,
             @PathVariable @NotNull Long userPoid) {
 
+        log.info("getDraft : docId={}, companyPoid={}, userPoid={}", docId, companyPoid, userPoid);
         if (StringUtils.isBlank(docId)) {
             return badRequest("docId is required");
         }
