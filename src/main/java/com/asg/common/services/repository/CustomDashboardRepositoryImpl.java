@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -174,16 +173,6 @@ public class CustomDashboardRepositoryImpl implements CustomDashboardRepository{
         }
 
         return list;
-    }
-
-    private boolean hasColumn(ResultSet rs, String column) throws SQLException {
-        ResultSetMetaData meta = rs.getMetaData();
-        for (int i = 1; i <= meta.getColumnCount(); i++) {
-            if (column.equalsIgnoreCase(meta.getColumnName(i))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
