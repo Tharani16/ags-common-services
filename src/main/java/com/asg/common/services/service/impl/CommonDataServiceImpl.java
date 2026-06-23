@@ -36,6 +36,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -424,6 +427,15 @@ public class CommonDataServiceImpl implements CommonDataService {
                     : "Address Master POID: " + addressMasterPoid;
             throw new ValidationException("No address details found for " + identifier);
         }
+
+        Set<String> allowedTypes = Set.of("MAIN", "OPERATION", "SALES", "CAN", "FIN");
+        Map<String, LovGetListDto> typelovMap = lovService.getDetailsByCodesAndLovName(new ArrayList<>(allowedTypes), "ADDRESS_PARTY_TYPE");
+
+        addressDetailsList = addressDetailsList.stream()
+                .filter(a -> a.getAddressType() != null && allowedTypes.contains(a.getAddressType().toUpperCase()))
+                .collect(Collectors.toList());
+
+        addressDetailsList.forEach(a -> a.setAddressTypeDet(typelovMap.get(a.getAddressType())));
 
         return new AddressDetailsListResponseDto(addressDetailsList);
     }
