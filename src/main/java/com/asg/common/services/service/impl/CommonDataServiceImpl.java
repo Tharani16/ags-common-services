@@ -429,13 +429,19 @@ public class CommonDataServiceImpl implements CommonDataService {
         }
 
         Set<String> allowedTypes = Set.of("MAIN", "OPERATION", "SALES", "CAN", "FIN");
-        Map<String, LovGetListDto> typelovMap = lovService.getDetailsByCodesAndLovName(new ArrayList<>(allowedTypes), "ADDRESS_PARTY_TYPE");
+        Map<String, LovGetListDto> typelovMap = Map.of(
+                "MAIN",      new LovGetListDto(null, "MAIN",      "Main",                 null, null, 1, null),
+                "OPERATION", new LovGetListDto(null, "OPERATION", "Operation",            null, null, 2, null),
+                "SALES",     new LovGetListDto(null, "SALES",     "Sales",                null, null, 3, null),
+                "CAN",       new LovGetListDto(null, "CAN",       "Cargo Arrival Notice", null, null, 4, null),
+                "FIN",       new LovGetListDto(null, "FIN",       "Finance",              null, null, 5, null)
+        );
 
         addressDetailsList = addressDetailsList.stream()
                 .filter(a -> a.getAddressType() != null && allowedTypes.contains(a.getAddressType().toUpperCase()))
                 .collect(Collectors.toList());
 
-        addressDetailsList.forEach(a -> a.setAddressTypeDet(typelovMap.get(a.getAddressType())));
+        addressDetailsList.forEach(a -> a.setAddressTypeDet(typelovMap.get(a.getAddressType().toUpperCase())));
 
         return new AddressDetailsListResponseDto(addressDetailsList);
     }
