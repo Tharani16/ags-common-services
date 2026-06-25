@@ -243,8 +243,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new IllegalArgumentException("File Name Mapped is required for deletion");
         }
         
-        // Check if attachment exists before deletion
-        Optional<Attachment> attachment = attachmentRepository.findByDocIdAndDocKeyPoidAndFileNameMapped(docId, docKeyPoid, fileNameMapped);
+        // Check if attachment exists before deletion (includes archived attachments)
+        Optional<Attachment> attachment = attachmentRepository.findByDocIdAndDocKeyPoidAndFileNameMappedForArchive(docId, docKeyPoid, fileNameMapped);
         if (attachment.isEmpty()) {
             throw new ResourceNotFoundException("Attachment", "parameters", "docId=" + docId + ", docKeyPoid=" + docKeyPoid + ", fileNameMapped=" + fileNameMapped);
         }
