@@ -82,7 +82,8 @@
 		     PERIOD and PERIOD2 cast to ::date.
 		     No schema prefix - schema resolved at runtime. -->
         <queryString language="sql">
-            <![CDATA[SELECT * FROM fn_dyn_cnt_year_wise_rpt_prt( $P{COMPANY_POID_CSV}, $P{PERIOD}, $P{PERIOD2}, $P{LINE1}, $P{CUSTOMER}, $P{BL_TYPE}, $P{CNT_TYPE}, $P{COM_YEAR} )]]>
+<!--            <![CDATA[SELECT * FROM fn_dyn_cnt_year_wise_rpt_prt( $P{COMPANY_POID_CSV}, $P{PERIOD}, $P{PERIOD2}, $P{LINE1}, $P{CUSTOMER}, $P{BL_TYPE}, $P{CNT_TYPE}, $P{COM_YEAR} )]]>-->
+                <![CDATA[SELECT * FROM fn_dyn_cnt_year_wise_rpt_prt( string_to_array($P{COMPANY_POID_CSV}, ',')::numeric[], $P{PERIOD}, $P{PERIOD2}, $P{LINE1}, $P{CUSTOMER}, $P{BL_TYPE}, $P{CNT_TYPE}, $P{COM_YEAR} )]]>
         </queryString>
 		<field name="YEARS" class="java.math.BigDecimal"/>
 		<field name="IMPORT_20_FT" class="java.math.BigDecimal"/>
