@@ -51,7 +51,7 @@ public class DynamicReportPrintService {
      */
     private void convertCompanyPoidParam(Map<String, Object> params, String docId) throws Exception {
         Object raw = params.get("COMPANY_POID");
-        if (docId.equals("600-201")) {
+        if (docId.equals("600-201") || docId.equals("600-203")) {
             raw = params.get("COMPANY");
         }
         if (raw instanceof List<?> list) {
@@ -73,13 +73,14 @@ public class DynamicReportPrintService {
                         .collect(Collectors.joining(",")));
 
             }
-            // 600-201: Asset Wise Depreciation Schedule Report - Instead of COMPANY_POID we are getting COMPANY so converting back to Support JRXML
-            if (docId.equals("600-201")) {
+            // Instead of COMPANY_POID we are getting COMPANY so converting back to Support JRXML
+            // 600-201: Asset Wise Depreciation Schedule Report
+            // 600-203: Asset Category Wise Depreciation Posting Report
+            if (docId.equals("600-201") || docId.equals("600-203")) {
                 params.put("COMPANY", params.get("COMPANY_POID"));
                 params.put("COMPANY_CSV", params.get("COMPANY_POID_CSV"));
             }
         }
-        // 600-203: Asset Category Wise Depreciation Posting Report - FE Is sending COMPANY_POID but in JRXML it is used as COMPANY
         if (docId.equals("600-203")) {
             params.put("COMPANY", params.get("COMPANY_POID"));
             params.put("COMPANY_CSV", params.get("COMPANY_POID_CSV"));
