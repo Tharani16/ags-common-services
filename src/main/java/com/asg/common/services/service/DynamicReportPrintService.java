@@ -81,10 +81,6 @@ public class DynamicReportPrintService {
                 params.put("COMPANY_CSV", params.get("COMPANY_POID_CSV"));
             }
         }
-        if (docId.equals("600-203")) {
-            params.put("COMPANY", params.get("COMPANY_POID"));
-            params.put("COMPANY_CSV", params.get("COMPANY_POID_CSV"));
-        }
     }
     
     private void convertDateParams(Map<String, Object> params) {
