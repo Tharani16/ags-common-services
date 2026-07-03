@@ -94,7 +94,7 @@
 		     COMPANY is multiselect array (numeric[]) in PostgreSQL; Oracle used single NUMBER.
 		     No schema prefix - schema resolved at runtime. -->
 		<queryString language="sql">
-			<![CDATA[SELECT * FROM fn_fa_deprec_rpt_cate_print( $P{COMPANY_CSV}, $P{DEP_DATE}::date, $P{ASSET_TYPE} )]]>
+			<![CDATA[SELECT * FROM fn_fa_deprec_rpt_cate_print( $P{COMPANY}, $P{DEP_DATE}::date, $P{ASSET_TYPE} )]]>
 		</queryString>
 		<field name="ASSET_TYPE" class="java.lang.String"/>
 		<field name="GROSS_BLOCK_START" class="java.math.BigDecimal"/>
