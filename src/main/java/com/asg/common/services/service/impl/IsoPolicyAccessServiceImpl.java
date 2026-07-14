@@ -2,6 +2,7 @@ package com.asg.common.services.service.impl;
 
 import com.asg.common.lib.exception.ResourceNotFoundException;
 import com.asg.common.lib.security.util.UserContext;
+import com.asg.common.lib.service.LovDataService;
 import com.asg.common.services.dto.IsoPolicyAccessRequestDto;
 import com.asg.common.services.dto.IsoPolicyAccessResponseDto;
 import com.asg.common.services.dto.IsoPolicyAttachmentDto;
@@ -12,7 +13,9 @@ import com.asg.common.services.service.IsoPolicyAccessService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +48,10 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
+
+    private final LovDataService lovDataService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -61,6 +68,9 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
     private static final String ATTACHMENT = "Attachment";
     private static final String YES = "Y";
     private static final String UNCATEGORISED = "Uncategorised";
+
+    /** ADMIN_ISO_COMP_POLICY_HDR.CATEGORY stores this LOV's code; the folder shows its label. */
+    private static final String LOV_ISO_CATEGORY = "ISO_CATEGORY";
 
     /**
      * Who may see a document, as one predicate over {@code h} — bound to :employeePoid and
@@ -271,9 +281,13 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
                         LinkedHashMap::new,
                         Collectors.toList()));
 
+        Map<String, String> categoryLabels = resolveCategoryLabels(byCategory.keySet());
+
         return byCategory.entrySet().stream().map(entry -> {
+            String code = entry.getKey();
             IsoPolicyDocumentFolderDto folder = new IsoPolicyDocumentFolderDto();
-            folder.setCategory(entry.getKey());
+            folder.setCategoryCode(code);
+            folder.setCategory(categoryLabels.getOrDefault(code, code));
             folder.setDocuments(entry.getValue());
             folder.setDocumentCount(entry.getValue().size());
             folder.setAttachmentCount(
@@ -342,6 +356,33 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
         dto.setDetRowId(toLong(written[0]));
         dto.setLoggedOn(toDateTime(written[1]));
         return dto;
+    }
+
+    /**
+     * Turns the ISO_CATEGORY codes stored on the documents into the labels the widget shows as folder
+     * names. Resolved once for the distinct codes rather than per document.
+     * <p>
+     * CATEGORY holds the LOV <em>code</em>, so grouping on it raw would name the Home page folders
+     * 'C001' instead of 'Distillation'. A code with no LOV entry is left as-is by the caller rather
+     * than dropped — an unnamed folder still beats a missing document.
+     */
+    private Map<String, String> resolveCategoryLabels(Set<String> categoryCodes) {
+        List<String> codes = categoryCodes.stream()
+                .filter(code -> !UNCATEGORISED.equals(code))
+                .toList();
+        if (codes.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, String> labels = new LinkedHashMap<>();
+        lovDataService.getDetailsByCodesAndLovName(codes, LOV_ISO_CATEGORY)
+                .forEach((code, lov) -> {
+                    String label = lov == null ? null : lov.getLabel();
+                    if (StringUtils.isNotBlank(label)) {
+                        labels.put(code, label);
+                    }
+                });
+        return labels;
     }
 
     /**

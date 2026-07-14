@@ -6,11 +6,15 @@ import java.util.List;
 
 /**
  * One folder in the Home page Documents widget. The SRS says the folders are driven by the
- * document's Category ("Each of the Department and ISO will be a folder in Home widget").
+ * document's Category ("it should show the folders based on the category").
  */
 @Data
 public class IsoPolicyDocumentFolderDto {
 
+    /** The ISO_CATEGORY LOV code stored on the document — the key, not the display text. */
+    private String categoryCode;
+
+    /** The folder's name: the ISO_CATEGORY label. Falls back to the code if the LOV has no entry. */
     private String category;
 
     private int documentCount;
