@@ -8,11 +8,15 @@ import java.util.List;
 
 /**
  * One ISO document or policy as it appears to an employee in the Home page Documents widget.
- * The document is itself a folder in the UI: its {@link #attachments} are the files inside it,
- * and the acknowledgement fields are the metadata shown against it.
+ * <p>
+ * The document <b>is</b> the folder — the widget has two levels, not three: document (folder) ->
+ * attachment (file). There is deliberately no category folder above it.
  */
 @Data
 public class IsoPolicyDocumentDto {
+
+    /** Discriminator for the widget's tree: this node renders as a folder. */
+    private final String type = "folder";
 
     private Long transactionPoid;
     private String docRef;

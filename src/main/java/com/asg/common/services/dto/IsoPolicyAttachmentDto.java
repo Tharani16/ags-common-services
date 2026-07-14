@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 @Data
 public class IsoPolicyAttachmentDto {
 
+    /** Discriminator for the widget's tree: this node renders as a file inside its document folder. */
+    private final String type = "file";
+
     /**
      * The attachment id ({@code GLOBAL_ATTACHMENTS.SEQNO}). Pass this back to the event-log endpoint
      * when recording an access or acknowledgement.
@@ -23,8 +26,12 @@ public class IsoPolicyAttachmentDto {
     /** Original file name, e.g. "Information Security Policy.pdf". Display only. */
     private String fileName;
 
-    /** Name the file is stored under; this is what the download endpoint takes. */
-    private String fileNameMapped;
+    /**
+     * {@code GLOBAL_ATTACHMENTS.FILE_NAME_MAPPED} — the name the file is actually stored under on
+     * disk, and what the download endpoint takes. Named to match the platform's own
+     * {@code AttachmentDto.storedFileName}, which maps the same column.
+     */
+    private String storedFileName;
 
     private String fileRemarks;
     private String checklistName;

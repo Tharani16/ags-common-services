@@ -2,7 +2,7 @@ package com.asg.common.services.controller;
 
 import com.asg.common.services.dto.IsoPolicyAccessRequestDto;
 import com.asg.common.services.dto.IsoPolicyAccessResponseDto;
-import com.asg.common.services.dto.IsoPolicyDocumentFolderDto;
+import com.asg.common.services.dto.IsoPolicyDocumentDto;
 import com.asg.common.services.service.IsoPolicyAccessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,16 +43,16 @@ public class IsoPolicyAccessController {
 
     @Operation(summary = "List the ISO documents and policies published to the logged-in employee",
             description = "Backs the Home page Documents widget. Returns the documents visible to the employee "
-                    + "(published to All Employees, to their department, or to them by name), grouped into Category "
-                    + "folders, each document carrying its attachments — the document is the folder, the files are "
-                    + "the content — plus whether the employee still owes an acknowledgement. Expired documents are "
-                    + "excluded unless includeExpired=true.")
+                    + "(published to All Employees, to their department, or to them by name), each carrying its "
+                    + "attachments — the document is the folder, its files are the content — plus whether the "
+                    + "employee still owes an acknowledgement. Expired documents are excluded unless "
+                    + "includeExpired=true.")
     @GetMapping("/my-documents")
     public ResponseEntity<?> getMyDocuments(
             @Parameter(description = "Include documents past their expiry date")
             @RequestParam(required = false, defaultValue = "false") boolean includeExpired) {
-        List<IsoPolicyDocumentFolderDto> folders = isoPolicyAccessService.getMyDocuments(includeExpired);
-        return success("Documents retrieved successfully", folders);
+        List<IsoPolicyDocumentDto> documents = isoPolicyAccessService.getMyDocuments(includeExpired);
+        return success("Documents retrieved successfully", documents);
     }
 
     @Operation(summary = "Record the logged-in employee's access / acknowledgement of a file",
