@@ -2,20 +2,16 @@ package com.asg.common.services.service.impl;
 
 import com.asg.common.lib.exception.ResourceNotFoundException;
 import com.asg.common.lib.security.util.UserContext;
-import com.asg.common.lib.service.LovDataService;
 import com.asg.common.services.dto.IsoPolicyAccessRequestDto;
 import com.asg.common.services.dto.IsoPolicyAccessResponseDto;
 import com.asg.common.services.dto.IsoPolicyAttachmentDto;
 import com.asg.common.services.dto.IsoPolicyDocumentDto;
-import com.asg.common.services.dto.IsoPolicyDocumentFolderDto;
 import com.asg.common.services.enums.IsoPolicyLogType;
 import com.asg.common.services.service.IsoPolicyAccessService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +44,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
-
-    private final LovDataService lovDataService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -67,10 +60,6 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
     private static final String RESOURCE = "ISO Document / Policy";
     private static final String ATTACHMENT = "Attachment";
     private static final String YES = "Y";
-    private static final String UNCATEGORISED = "Uncategorised";
-
-    /** ADMIN_ISO_COMP_POLICY_HDR.CATEGORY stores this LOV's code; the folder shows its label. */
-    private static final String LOV_ISO_CATEGORY = "ISO_CATEGORY";
 
     /**
      * Who may see a document, as one predicate over {@code h} — bound to :employeePoid and
@@ -247,17 +236,16 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
     }
 
     /**
-     * Groups the employee's visible documents into Category folders, each document carrying its
-     * files: the document is the folder, the attachments are the content. Each file carries this
-     * employee's own access and acknowledgement state, aggregated from the event log.
+     * The employee's visible documents, each carrying its files. The widget's tree is two levels —
+     * document (folder) -> attachment (file) — so this returns a flat list of documents and does not
+     * group them under a Category folder.
      * <p>
-     * The SRS text drives the folders off Category ("Each of the Department and ISO will be a folder
-     * in Home widget"), which is what this does; the mockup instead shows folders named after Doc
-     * Type. Confirmed with the user: Category wins.
+     * Each file carries this employee's own access and acknowledgement state, aggregated from the
+     * event log.
      */
     @Override
     @Transactional(readOnly = true)
-    public List<IsoPolicyDocumentFolderDto> getMyDocuments(boolean includeExpired) {
+    public List<IsoPolicyDocumentDto> getMyDocuments(boolean includeExpired) {
         // A login with no employee record — an admin, say — simply owns no documents. The Home
         // widget renders empty rather than erroring.
         Optional<Employee> caller = findEmployee();
@@ -274,28 +262,7 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
         List<IsoPolicyDocumentDto> documents = rows.stream().map(this::toDocumentDto).toList();
         attachFiles(documents, me);
         documents.forEach(this::rollUpAcknowledgement);
-
-        Map<String, List<IsoPolicyDocumentDto>> byCategory = documents.stream()
-                .collect(Collectors.groupingBy(
-                        d -> d.getCategory() == null ? UNCATEGORISED : d.getCategory(),
-                        LinkedHashMap::new,
-                        Collectors.toList()));
-
-        Map<String, String> categoryLabels = resolveCategoryLabels(byCategory.keySet());
-
-        return byCategory.entrySet().stream().map(entry -> {
-            String code = entry.getKey();
-            IsoPolicyDocumentFolderDto folder = new IsoPolicyDocumentFolderDto();
-            folder.setCategoryCode(code);
-            folder.setCategory(categoryLabels.getOrDefault(code, code));
-            folder.setDocuments(entry.getValue());
-            folder.setDocumentCount(entry.getValue().size());
-            folder.setAttachmentCount(
-                    entry.getValue().stream().mapToInt(IsoPolicyDocumentDto::getAttachmentCount).sum());
-            folder.setAcknowledgementPendingCount(
-                    (int) entry.getValue().stream().filter(IsoPolicyDocumentDto::isAcknowledgementPending).count());
-            return folder;
-        }).toList();
+        return documents;
     }
 
     @Override
@@ -312,8 +279,8 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
         // above all cannot acknowledge, against a document that was never published to them — those
         // rows are what an ISO auditor acts on.
         Object[] header = visibleHeader(transactionPoid, me);
-        String acknowledgementRequired = (String) header[0];
-        String docVersion = (String) header[1];
+        String acknowledgementRequired = toStr(header[0]);
+        String docVersion = toStr(header[1]);
 
         if (logType == IsoPolicyLogType.Acknowledged && !YES.equalsIgnoreCase(acknowledgementRequired)) {
             // IllegalArgumentException, not the lib's ValidationException: this service's
@@ -356,33 +323,6 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
         dto.setDetRowId(toLong(written[0]));
         dto.setLoggedOn(toDateTime(written[1]));
         return dto;
-    }
-
-    /**
-     * Turns the ISO_CATEGORY codes stored on the documents into the labels the widget shows as folder
-     * names. Resolved once for the distinct codes rather than per document.
-     * <p>
-     * CATEGORY holds the LOV <em>code</em>, so grouping on it raw would name the Home page folders
-     * 'C001' instead of 'Distillation'. A code with no LOV entry is left as-is by the caller rather
-     * than dropped — an unnamed folder still beats a missing document.
-     */
-    private Map<String, String> resolveCategoryLabels(Set<String> categoryCodes) {
-        List<String> codes = categoryCodes.stream()
-                .filter(code -> !UNCATEGORISED.equals(code))
-                .toList();
-        if (codes.isEmpty()) {
-            return Map.of();
-        }
-
-        Map<String, String> labels = new LinkedHashMap<>();
-        lovDataService.getDetailsByCodesAndLovName(codes, LOV_ISO_CATEGORY)
-                .forEach((code, lov) -> {
-                    String label = lov == null ? null : lov.getLabel();
-                    if (StringUtils.isNotBlank(label)) {
-                        labels.put(code, label);
-                    }
-                });
-        return labels;
     }
 
     /**
@@ -508,41 +448,41 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
         if (rows.isEmpty()) {
             throw new ResourceNotFoundException(ATTACHMENT, "attachmentId", attachmentId);
         }
-        return (String) rows.get(0);
+        return toStr(rows.get(0));
     }
 
     private IsoPolicyDocumentDto toDocumentDto(Object[] row) {
         IsoPolicyDocumentDto dto = new IsoPolicyDocumentDto();
         dto.setTransactionPoid(toLong(row[0]));
-        dto.setDocRef((String) row[1]);
-        dto.setDocName((String) row[2]);
-        dto.setDocType((String) row[3]);
-        dto.setCategory((String) row[4]);
-        dto.setDescription((String) row[5]);
-        dto.setVersionNo((String) row[6]);
+        dto.setDocRef(toStr(row[1]));
+        dto.setDocName(toStr(row[2]));
+        dto.setDocType(toStr(row[3]));
+        dto.setCategory(toStr(row[4]));
+        dto.setDescription(toStr(row[5]));
+        dto.setVersionNo(toStr(row[6]));
         dto.setExpiryDate(toDate(row[7]));
         dto.setPublishedOn(toDateTime(row[8]));
-        dto.setAcknowledgementRequired(YES.equalsIgnoreCase((String) row[9]));
+        dto.setAcknowledgementRequired(YES.equalsIgnoreCase(toStr(row[9])));
         return dto;
     }
 
     private IsoPolicyAttachmentDto toAttachmentDto(Object[] row, IsoPolicyDocumentDto document) {
         IsoPolicyAttachmentDto dto = new IsoPolicyAttachmentDto();
         dto.setAttachmentId(toLong(row[1]));
-        dto.setFileName((String) row[2]);
-        dto.setFileNameMapped((String) row[3]);
-        dto.setFileRemarks((String) row[4]);
-        dto.setChecklistName((String) row[5]);
-        dto.setUploadedBy((String) row[6]);
+        dto.setFileName(toStr(row[2]));
+        dto.setStoredFileName(toStr(row[3]));
+        dto.setFileRemarks(toStr(row[4]));
+        dto.setChecklistName(toStr(row[5]));
+        dto.setUploadedBy(toStr(row[6]));
         dto.setUploadedOn(toDateTime(row[7]));
         dto.setDownloadPath(String.format("/v1/attachments/%s/%d/%s/download",
-                attachmentDocId, toLong(row[0]), dto.getFileNameMapped()));
+                attachmentDocId, toLong(row[0]), dto.getStoredFileName()));
 
         dto.setLastAccessedTime(toDateTime(row[8]));
         Long accessCount = toLong(row[9]);
         dto.setAccessCount(accessCount == null ? 0L : accessCount);
         dto.setAcknowledgedTime(toDateTime(row[10]));
-        String acknowledgedVersion = (String) row[11];
+        String acknowledgedVersion = toStr(row[11]);
         dto.setAcknowledgedVersion(acknowledgedVersion);
 
         boolean acknowledged = dto.getAcknowledgedTime() != null;
@@ -558,6 +498,20 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
 
     private Long toLong(Object value) {
         return value == null ? null : ((Number) value).longValue();
+    }
+
+    /**
+     * Reads a text column out of an {@code Object[]} row.
+     * <p>
+     * Not a plain {@code (String)} cast: Hibernate hands a single-character column back as a
+     * {@link Character}, not a String, so casting blows up with a ClassCastException on every Y/N
+     * flag here — ACKNOWLEDGEMENT, and anything else declared VARCHAR2(1).
+     */
+    private String toStr(Object value) {
+        if (value == null) {
+            return null;
+        }
+        return value instanceof String s ? s : value.toString();
     }
 
     private LocalDateTime toDateTime(Object value) {

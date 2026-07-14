@@ -2,7 +2,7 @@ package com.asg.common.services.service;
 
 import com.asg.common.services.dto.IsoPolicyAccessRequestDto;
 import com.asg.common.services.dto.IsoPolicyAccessResponseDto;
-import com.asg.common.services.dto.IsoPolicyDocumentFolderDto;
+import com.asg.common.services.dto.IsoPolicyDocumentDto;
 
 import java.util.List;
 
@@ -18,16 +18,16 @@ import java.util.List;
 public interface IsoPolicyAccessService {
 
     /**
-     * The ISO documents and policies published to the logged-in employee, grouped into Category
-     * folders, each document carrying its attachments. Expired documents are excluded unless
-     * {@code includeExpired}.
+     * The ISO documents and policies published to the logged-in employee, each carrying its
+     * attachments — the document is the folder, its attachments are the files. Expired documents are
+     * excluded unless {@code includeExpired}.
      */
-    List<IsoPolicyDocumentFolderDto> getMyDocuments(boolean includeExpired);
+    List<IsoPolicyDocumentDto> getMyDocuments(boolean includeExpired);
 
     /**
-     * Records that the logged-in employee opened a document, and optionally that they acknowledged
-     * it. Upserts their single Access Log row: the first call creates it, later calls bump
-     * LAST_ACCESSED_TIME and ACCESS_COUNT.
+     * Appends one Access Log event for a single file: an open writes an {@code Accessed} row, an
+     * acknowledgement writes an {@code Acknowledged} row, stamped with the document's current
+     * version. Nothing is updated in place — the log is append-only.
      */
     IsoPolicyAccessResponseDto recordAccess(Long transactionPoid, IsoPolicyAccessRequestDto request);
 }
