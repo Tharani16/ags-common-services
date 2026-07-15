@@ -5,6 +5,7 @@ import com.asg.common.lib.security.util.UserContext;
 import com.asg.common.services.dto.IsoPolicyAccessRequestDto;
 import com.asg.common.services.dto.IsoPolicyAccessResponseDto;
 import com.asg.common.services.dto.IsoPolicyAttachmentDto;
+import com.asg.common.services.dto.IsoPolicyCategoryFolderDto;
 import com.asg.common.services.dto.IsoPolicyDocumentDto;
 import com.asg.common.services.enums.IsoPolicyLogType;
 import com.asg.common.services.service.IsoPolicyAccessService;
@@ -19,13 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +60,7 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
     private static final String RESOURCE = "ISO Document / Policy";
     private static final String ATTACHMENT = "Attachment";
     private static final String YES = "Y";
+    private static final String UNCATEGORISED = "Uncategorised";
 
     /**
      * Who may see a document, as one predicate over {@code h} — bound to :employeePoid and
@@ -252,16 +253,16 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
     }
 
     /**
-     * The employee's visible documents, each carrying its files. The widget's tree is two levels —
-     * document (folder) -> attachment (file) — so this returns a flat list of documents and does not
-     * group them under a Category folder.
+     * The Home page Documents widget: category folders, each holding every file from the documents in
+     * that category. The tree is two levels — category (folder) -> attachment (file); the documents
+     * are collapsed away, their files lifted directly under the category.
      * <p>
      * Each file carries this employee's own access and acknowledgement state, aggregated from the
-     * event log.
+     * event log. Expired documents are excluded unless {@code includeExpired}.
      */
     @Override
     @Transactional(readOnly = true)
-    public List<IsoPolicyDocumentDto> getMyDocuments(boolean includeExpired) {
+    public List<IsoPolicyCategoryFolderDto> getMyDocuments(boolean includeExpired) {
         // A login with no employee record — an admin, say — simply owns no documents. The Home
         // widget renders empty rather than erroring.
         Optional<Employee> caller = findEmployee();
@@ -277,8 +278,28 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
 
         List<IsoPolicyDocumentDto> documents = rows.stream().map(this::toDocumentDto).toList();
         attachFiles(documents, me);
-        documents.forEach(this::rollUpAcknowledgement);
-        return documents;
+
+        // Lift every document's files up under its category. The document query is already ordered by
+        // CATEGORY then CREATED_DATE DESC, so a LinkedHashMap keeps the folders and their files in that
+        // order. Per-file acknowledgement state was set in toAttachmentDto against the file's own
+        // document version, so it survives the flattening.
+        Map<String, List<IsoPolicyAttachmentDto>> byCategory = new LinkedHashMap<>();
+        for (IsoPolicyDocumentDto document : documents) {
+            String category = document.getCategory() == null ? UNCATEGORISED : document.getCategory();
+            byCategory.computeIfAbsent(category, k -> new ArrayList<>()).addAll(document.getAttachments());
+        }
+
+        return byCategory.entrySet().stream().map(entry -> {
+            List<IsoPolicyAttachmentDto> files = entry.getValue();
+            IsoPolicyCategoryFolderDto folder = new IsoPolicyCategoryFolderDto();
+            folder.setCategoryCode(entry.getKey());
+            folder.setCategory(entry.getKey());
+            folder.setAttachments(files);
+            folder.setAttachmentCount(files.size());
+            folder.setAcknowledgementPendingCount(
+                    (int) files.stream().filter(IsoPolicyAttachmentDto::isAcknowledgementPending).count());
+            return folder;
+        }).toList();
     }
 
     @Override
@@ -380,35 +401,6 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
             document.setAttachments(files);
             document.setAttachmentCount(files.size());
         });
-    }
-
-    /**
-     * Rolls the per-file acknowledgement state up to the document. The document is acknowledged only
-     * when every one of its files is acknowledged at the current version; it is pending when any file
-     * is still outstanding.
-     * <p>
-     * A document with no files is neither: there is nothing to read, so it is not counted as owed.
-     */
-    private void rollUpAcknowledgement(IsoPolicyDocumentDto document) {
-        List<IsoPolicyAttachmentDto> files = document.getAttachments();
-
-        document.setLastAccessedTime(files.stream()
-                .map(IsoPolicyAttachmentDto::getLastAccessedTime)
-                .filter(Objects::nonNull)
-                .max(Comparator.naturalOrder())
-                .orElse(null));
-
-        if (!document.isAcknowledgementRequired() || files.isEmpty()) {
-            document.setAcknowledged(false);
-            document.setAcknowledgementPending(false);
-            document.setAcknowledgementPendingCount(0);
-            return;
-        }
-
-        int pending = (int) files.stream().filter(IsoPolicyAttachmentDto::isAcknowledgementPending).count();
-        document.setAcknowledgementPendingCount(pending);
-        document.setAcknowledgementPending(pending > 0);
-        document.setAcknowledged(pending == 0);
     }
 
     /**
