@@ -206,6 +206,22 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
             """;
 
     /**
+     * Whether this employee already has an {@code Acknowledged} row for this file at this exact
+     * version. Guards against a second acknowledgement of the same version — {@code DOC_VERSION} is
+     * part of the match so a new version still lets a fresh acknowledgement through.
+     */
+    private static final String SQL_ACK_EXISTS = """
+            SELECT 1
+              FROM ADMIN_ISO_COMP_POLICY_LOG_DTL
+             WHERE TRANSACTION_POID = :transactionPoid
+               AND EMPLOYEE_POID    = :employeePoid
+               AND ATTACHMENT_ID    = :attachmentId
+               AND UPPER(LOG_TYPE)  = 'ACKNOWLEDGED'
+               AND DOC_VERSION      = :docVersion
+             FETCH FIRST 1 ROWS ONLY
+            """;
+
+    /**
      * Appends one event. DET_ROW_ID comes from a sequence, not MAX+1: this table is written by every
      * employee opening every file, and two concurrent opens computing MAX+1 would collide on the
      * primary key. The values need not be contiguous — it is a log.
@@ -282,11 +298,21 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
         String acknowledgementRequired = toStr(header[0]);
         String docVersion = toStr(header[1]);
 
-        if (logType == IsoPolicyLogType.Acknowledged && !YES.equalsIgnoreCase(acknowledgementRequired)) {
-            // IllegalArgumentException, not the lib's ValidationException: this service's
-            // GlobalExceptionHandler maps jakarta.xml.bind.ValidationException, so the lib one
-            // would fall through to the 500 handler instead of returning 400.
-            throw new IllegalArgumentException("This document does not require acknowledgement");
+        if (logType == IsoPolicyLogType.Acknowledged) {
+            if (!YES.equalsIgnoreCase(acknowledgementRequired)) {
+                // IllegalArgumentException, not the lib's ValidationException: this service's
+                // GlobalExceptionHandler maps jakarta.xml.bind.ValidationException, so the lib one
+                // would fall through to the 500 handler instead of returning 400.
+                throw new IllegalArgumentException("This document does not require acknowledgement");
+            }
+            // A file is acknowledged once per version. A second acknowledgement of the same version is
+            // rejected rather than appended, so the log cannot show one employee acknowledging one file
+            // twice at the same version. The version qualifier is deliberate: after the admin publishes
+            // a new version the employee owes a fresh acknowledgement, and that one must go through.
+            if (alreadyAcknowledged(transactionPoid, me.employeePoid(), attachmentId, docVersion)) {
+                throw new IllegalArgumentException("This file has already been acknowledged at version "
+                        + docVersion);
+            }
         }
 
         // Proves the file is live and belongs to this document, and gives us the name to snapshot.
@@ -449,6 +475,17 @@ public class IsoPolicyAccessServiceImpl implements IsoPolicyAccessService {
             throw new ResourceNotFoundException(ATTACHMENT, "attachmentId", attachmentId);
         }
         return toStr(rows.get(0));
+    }
+
+    private boolean alreadyAcknowledged(Long transactionPoid, Long employeePoid, Long attachmentId,
+                                        String docVersion) {
+        return !entityManager.createNativeQuery(SQL_ACK_EXISTS)
+                .setParameter("transactionPoid", transactionPoid)
+                .setParameter("employeePoid", employeePoid)
+                .setParameter("attachmentId", attachmentId)
+                .setParameter("docVersion", docVersion)
+                .getResultList()
+                .isEmpty();
     }
 
     private IsoPolicyDocumentDto toDocumentDto(Object[] row) {
